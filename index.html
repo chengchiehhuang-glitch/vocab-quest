@@ -186,7 +186,7 @@ button{font-family:inherit}
 .feedback{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);padding:12px 28px;border-radius:12px;font-size:15px;font-weight:600;z-index:999;transition:transform .3s ease;pointer-events:none}
 .feedback.show{transform:translateX(-50%) translateY(0)}.feedback.correct{background:var(--green);color:#042f2e}.feedback.wrong{background:var(--err);color:#fff}
 
-/* ===== RESULTS ??FULL BASEBALL SCENE ===== */
+/* ===== RESULTS — FULL BASEBALL SCENE ===== */
 #screen-results{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;position:relative;overflow:hidden}
 
 /* Baseball diamond SVG field */
@@ -357,7 +357,7 @@ button{font-family:inherit}
 <body>
 
 <!-- Home button (all screens) -->
-<button class="home-btn" id="home-btn" onclick="goHome()" title="Back to Home">??</button>
+<button class="home-btn" id="home-btn" onclick="goHome()" title="Back to Home">🏠</button>
 
 <div class="feedback" id="feedback"></div>
 
@@ -369,21 +369,21 @@ button{font-family:inherit}
     <div class="char-card m" onclick="selectChar('murphy')">
       <div class="ch-av m"></div>
       <div class="ch-name">Murphy</div>
-      <div class="ch-lvl">雿??冽?撣?Sasaki Roki</div>
+      <div class="ch-lvl">佐佐木朗希 Sasaki Roki</div>
       <div class="ch-badge">BEGINNER</div>
-      <button class="btn-upload" onclick="event.stopPropagation();openUpload('murphy')">? 銝?桀?</button>
+      <button class="btn-upload" onclick="event.stopPropagation();openUpload('murphy')">📷 上傳單字</button>
     </div>
     <div class="char-card o" onclick="selectChar('oliver')">
       <div class="ch-av o"></div>
       <div class="ch-name">Oliver</div>
-      <div class="ch-lvl">憭扯健蝧像 Ohtani Shohei</div>
+      <div class="ch-lvl">大谷翔平 Ohtani Shohei</div>
       <div class="ch-badge">INTERMEDIATE</div>
-      <button class="btn-upload" onclick="event.stopPropagation();openUpload('oliver')">? 銝?桀?</button>
+      <button class="btn-upload" onclick="event.stopPropagation();openUpload('oliver')">📷 上傳單字</button>
     </div>
   </div>
-  <div class="no-data-msg" id="murphy-msg" style="display:none">?? Murphy ?摮????芯???/div>
-  <div class="no-data-msg" id="oliver-msg" style="display:none">?? Oliver ?摮????芯???/div>
-  <button class="admin-link" onclick="showAdmin()">?? Teacher Dashboard</button>
+  <div class="no-data-msg" id="murphy-msg" style="display:none">⚠️ Murphy 的單字資料尚未上傳</div>
+  <div class="no-data-msg" id="oliver-msg" style="display:none">⚠️ Oliver 的單字資料尚未上傳</div>
+  <button class="admin-link" onclick="showAdmin()">📊 Teacher Dashboard</button>
 </div>
 
 <!-- ===== DASHBOARD ===== -->
@@ -396,17 +396,17 @@ button{font-family:inherit}
     </div>
   </div>
   <div class="week-sel">
-    <label>?? ?豢??望活嚗?/label>
+    <label>📅 選擇週次：</label>
     <select id="week-picker" onchange="switchWeek(this.value)"></select>
   </div>
   <div id="dash-content">
-    <div class="wl-title">?? Word List</div>
+    <div class="wl-title">📋 Word List</div>
     <div class="wg" id="wg"></div>
-    <button class="btn-go" onclick="startLearn()">?? Start Learning</button>
+    <button class="btn-go" onclick="startLearn()">📖 Start Learning</button>
   </div>
   <div class="week-empty hidden" id="week-empty">
-    <p>? ?飛??瘝?銝隞颱??桀?</p>
-    <p>隢蝙?具??銝?桀????賣憓摰?/p>
+    <p>📭 這個學生還沒有上傳任何單字</p>
+    <p>請使用「📷 上傳單字」功能新增內容</p>
   </div>
 </div>
 
@@ -416,7 +416,7 @@ button{font-family:inherit}
     <div class="top-bar"><div class="prog-info" id="l-prog"></div></div>
     <div class="prog-wrap"><div class="prog-fill blue" id="l-bar"></div></div>
     <div id="l-area"></div>
-    <button class="btn-next" id="l-next" onclick="nextCard()">Next ??/button>
+    <button class="btn-next" id="l-next" onclick="nextCard()">Next →</button>
   </div>
 </div>
 
@@ -426,13 +426,13 @@ button{font-family:inherit}
     <div class="top-bar"><div class="prog-info" id="s-prog"></div></div>
     <div class="prog-wrap"><div class="prog-fill blue" id="s-bar"></div></div>
     <div id="s-area"></div>
-    <button class="btn-next" id="s-next" onclick="nextSent()">Next ??/button>
+    <button class="btn-next" id="s-next" onclick="nextSent()">Next →</button>
   </div>
 </div>
 
 <!-- ===== QUIZ ===== -->
 <div id="screen-quiz" class="hidden">
-  <div class="q-top"><div class="q-phase" id="q-phase"></div><div class="q-pts">?? <span class="v" id="q-pts-v">0</span> pts</div></div>
+  <div class="q-top"><div class="q-phase" id="q-phase"></div><div class="q-pts">🏆 <span class="v" id="q-pts-v">0</span> pts</div></div>
   <div class="prog-wrap"><div class="prog-fill purple" id="q-bar"></div></div>
   <div id="q-content"></div>
 </div>
@@ -458,18 +458,18 @@ button{font-family:inherit}
     <div class="k-stamp" id="k-stamp">K</div>
     <div class="r-overlay" id="r-overlay"><div class="r-big" id="r-big"></div><div class="r-sub" id="r-sub"></div></div>
   </div>
-  <div class="speed-box" id="sp-box" style="opacity:0"><div class="sp-num" id="sp-num">0</div><div class="sp-unit">MPH嚗?嚗?/div><div class="sp-lbl" id="sp-lbl"></div></div>
+  <div class="speed-box" id="sp-box" style="opacity:0"><div class="sp-num" id="sp-num">0</div><div class="sp-unit">MPH（邁）</div><div class="sp-lbl" id="sp-lbl"></div></div>
   <div class="r-stats" id="r-stats-wrap" style="opacity:0">
     <div class="r-stats-card">
       <div class="rs-row">
-        <div class="rs-i"><div class="ic">?儭?/div><div class="vl" id="r-mc">0</div><div class="lb">?豢?憿?/div></div>
-        <div class="rs-i"><div class="ic">??</div><div class="vl" id="r-sp">0</div><div class="lb">憛怎征憿?/div></div>
-        <div class="rs-i"><div class="ic">??</div><div class="vl" id="r-mt">0</div><div class="lb">??憿?/div></div>
+        <div class="rs-i"><div class="ic">🅰️</div><div class="vl" id="r-mc">0</div><div class="lb">選擇題</div></div>
+        <div class="rs-i"><div class="ic">✏️</div><div class="vl" id="r-sp">0</div><div class="lb">填空題</div></div>
+        <div class="rs-i"><div class="ic">🔗</div><div class="vl" id="r-mt">0</div><div class="lb">配對題</div></div>
       </div>
       <div class="wr-words" id="wr-sec"></div>
       <div class="r-btns">
-        <button class="btn-go" onclick="startQuiz()">?? Retry</button>
-        <button class="btn-go gold" onclick="goToDash()">?? Dashboard</button>
+        <button class="btn-go" onclick="startQuiz()">🔄 Retry</button>
+        <button class="btn-go gold" onclick="goToDash()">📊 Dashboard</button>
       </div>
     </div>
   </div>
@@ -477,15 +477,15 @@ button{font-family:inherit}
 
 <!-- ===== ADMIN ===== -->
 <div id="screen-admin" class="hidden">
-  <div class="a-head"><h2>?? Teacher Dashboard</h2><div id="conn-status" style="font-size:11px;padding:4px 12px;border-radius:12px;background:var(--surface2);color:var(--dim)">checking...</div></div>
+  <div class="a-head"><h2>📊 Teacher Dashboard</h2><div id="conn-status" style="font-size:11px;padding:4px 12px;border-radius:12px;background:var(--surface2);color:var(--dim)">checking...</div></div>
   <div class="a-tabs" id="a-tabs">
     <button class="a-tab on" onclick="adminTab('all')">All</button>
     <button class="a-tab" onclick="adminTab('murphy')">Murphy</button>
     <button class="a-tab" onclick="adminTab('oliver')">Oliver</button>
   </div>
   <div style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap">
-    <button class="btn-upload" onclick="openUpload('murphy')" style="margin:0">? Murphy 銝?桀?</button>
-    <button class="btn-upload" onclick="openUpload('oliver')" style="margin:0">? Oliver 銝?桀?</button>
+    <button class="btn-upload" onclick="openUpload('murphy')" style="margin:0">📷 Murphy 上傳單字</button>
+    <button class="btn-upload" onclick="openUpload('oliver')" style="margin:0">📷 Oliver 上傳單字</button>
   </div>
   <div id="a-content"></div>
 </div>
@@ -493,18 +493,18 @@ button{font-family:inherit}
 <!-- ===== UPLOAD MODAL ===== -->
 <div class="upload-modal hidden" id="upload-modal">
   <div class="upload-box">
-    <h3 id="upload-title">? 銝?桀??抒?</h3>
-    <div class="sub" id="upload-sub">???摮”??嚗??芸?銝??Google Drive</div>
+    <h3 id="upload-title">📷 上傳單字照片</h3>
+    <div class="sub" id="upload-sub">拍照或選取單字表圖片，會自動上傳到 Google Drive</div>
     <img class="upload-preview" id="upload-preview">
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('upload-file').click()">
-      <div class="icon">?</div>
-      <div class="hint">暺?<b>?</b>??b>?豢???</b></div>
+      <div class="icon">📸</div>
+      <div class="hint">點擊<b>拍照</b>或<b>選擇圖片</b></div>
     </div>
     <input type="file" accept="image/*" capture="environment" id="upload-file" class="upload-input" onchange="handleFile(this)">
     <div class="upload-status" id="upload-status"></div>
     <div class="upload-btns">
-      <button class="btn-cancel" onclick="closeUpload()">??</button>
-      <button class="btn-send" id="btn-send" onclick="sendUpload()" disabled>銝??Google Drive</button>
+      <button class="btn-cancel" onclick="closeUpload()">取消</button>
+      <button class="btn-send" id="btn-send" onclick="sendUpload()" disabled>上傳至 Google Drive</button>
     </div>
   </div>
 </div>
@@ -516,27 +516,29 @@ const WORD_BANKS = {
     "Week 6": {
       unit:'H3-7.2', count:15,
       words:[
-        {word:"finally",pos:"adverb",def:"after a long time or some difficulty",zh:"蝯",sentences:["After months of looking, he <mark>finally</mark> found a job.","She <mark>finally</mark> passed her driving test on the third try."]},
-        {word:"money",pos:"noun",def:"the coins or banknotes (pieces of paper with values) that are used to buy things",zh:"??,sentences:["It costs a lot of <mark>money</mark> to buy a house.","He saved enough <mark>money</mark> to take a trip abroad."]},
-        {word:"African",pos:"adjective",def:"relating or belonging to Africa; someone from Africa",zh:"?散??,sentences:["One of my best friends is <mark>African</mark>.","<mark>African</mark> elephants are the largest land animals on Earth."]},
-        {word:"savanna",pos:"noun",def:"a large, flat area of land covered with grass, usually with few trees, that is found in hot countries, especially in Africa",zh:"?賢?嚗???,sentences:["Many wild animals live on the <mark>savanna</mark>.","The <mark>savanna</mark> stretches for hundreds of miles across the continent."]},
-        {word:"predators",pos:"plural noun",def:"an animal that hunts, kills, and eats other animals",zh:"????,sentences:["Lions, tigers, and bears are considered <mark>predators</mark>.","Small fish try to hide from <mark>predators</mark> in the coral reef."]},
-        {word:"protection",pos:"noun",def:"the act of protecting or state of being protected",zh:"靽風",sentences:["Always wear goggles as a <mark>protection</mark> for your eyes when using the machines.","The mother bird spread her wings in <mark>protection</mark> of her young."]},
-        {word:"morning",pos:"noun",def:"the part of the day from the time when the sun rises or you wake up until the middle of the day or lunch time",zh:"?拐?",sentences:["I got up late this <mark>morning</mark>.","She goes jogging every <mark>morning</mark> before breakfast."]},
-        {word:"format",pos:"noun",def:"the way something is designed, arranged, or produced",zh:"?澆?",sentences:["This year's event will have a new <mark>format</mark>.","Please save the file in PDF <mark>format</mark>."]},
-        {word:"explore",pos:"verb",def:"to go around a place where you have never been in order to find out what is there",zh:"?Ｙ揣",sentences:["The best way to <mark>explore</mark> the countryside is on foot.","Children love to <mark>explore</mark> the woods behind the school."]},
-        {word:"bargain",pos:"noun",def:"something on sale at a lower price than its true value",zh:"靘踹?鞎剁???",sentences:["We got tickets to the show at half-price, a real <mark>bargain</mark>.","This jacket was a <mark>bargain</mark> at only ten dollars."]},
-        {word:"weird",pos:"adjective",def:"very strange and unusual, unexpected, or not natural",zh:"憟芰?",sentences:["That's <mark>weird</mark>, I thought I left my keys on the table but they're not there.","He has a <mark>weird</mark> habit of talking to himself in public."]},
-        {word:"allies",pos:"plural noun",def:"someone who helps and supports someone else",zh:"??",sentences:["We need to become <mark>allies</mark> to solve this problem.","The two countries have been <mark>allies</mark> for over fifty years."]},
-        {word:"kingdom",pos:"noun",def:"one of the groups that natural things can be divided into, depending on their type",zh:"??嚗?",sentences:["What do you know about the animal <mark>kingdom</mark>?","The plant <mark>kingdom</mark> includes trees, flowers, and grasses."]},
-        {word:"cluster",pos:"verb",def:"to form or gather together",zh:"??",sentences:["All of his grandchildren <mark>clustered</mark> around him.","Stars <mark>cluster</mark> together to form galaxies."]},
-        {word:"anemone",pos:"noun",def:"a soft, brightly colored sea creature that looks like a flower and often lives on rocks in the ocean",zh:"瘚瑁",sentences:["At low tide you can explore the tide pools for crabs, starfish, and <mark>anemones</mark>.","The clownfish lives inside the <mark>anemone</mark> for protection."]}
+        {word:"finally",pos:"adverb",def:"after a long time or some difficulty",zh:"終於",sentences:["After months of looking, he <mark>finally</mark> found a job.","She <mark>finally</mark> passed her driving test on the third try."]},
+        {word:"money",pos:"noun",def:"the coins or banknotes (pieces of paper with values) that are used to buy things",zh:"錢",sentences:["It costs a lot of <mark>money</mark> to buy a house.","He saved enough <mark>money</mark> to take a trip abroad."]},
+        {word:"African",pos:"adjective",def:"relating or belonging to Africa; someone from Africa",zh:"非洲的",sentences:["One of my best friends is <mark>African</mark>.","<mark>African</mark> elephants are the largest land animals on Earth."]},
+        {word:"savanna",pos:"noun",def:"a large, flat area of land covered with grass, usually with few trees, that is found in hot countries, especially in Africa",zh:"莽原；草原",sentences:["Many wild animals live on the <mark>savanna</mark>.","The <mark>savanna</mark> stretches for hundreds of miles across the continent."]},
+        {word:"predators",pos:"plural noun",def:"an animal that hunts, kills, and eats other animals",zh:"掠食者",sentences:["Lions, tigers, and bears are considered <mark>predators</mark>.","Small fish try to hide from <mark>predators</mark> in the coral reef."]},
+        {word:"protection",pos:"noun",def:"the act of protecting or state of being protected",zh:"保護",sentences:["Always wear goggles as a <mark>protection</mark> for your eyes when using the machines.","The mother bird spread her wings in <mark>protection</mark> of her young."]},
+        {word:"morning",pos:"noun",def:"the part of the day from the time when the sun rises or you wake up until the middle of the day or lunch time",zh:"早上",sentences:["I got up late this <mark>morning</mark>.","She goes jogging every <mark>morning</mark> before breakfast."]},
+        {word:"format",pos:"noun",def:"the way something is designed, arranged, or produced",zh:"格式",sentences:["This year's event will have a new <mark>format</mark>.","Please save the file in PDF <mark>format</mark>."]},
+        {word:"explore",pos:"verb",def:"to go around a place where you have never been in order to find out what is there",zh:"探索",sentences:["The best way to <mark>explore</mark> the countryside is on foot.","Children love to <mark>explore</mark> the woods behind the school."]},
+        {word:"bargain",pos:"noun",def:"something on sale at a lower price than its true value",zh:"便宜貨；划算",sentences:["We got tickets to the show at half-price, a real <mark>bargain</mark>.","This jacket was a <mark>bargain</mark> at only ten dollars."]},
+        {word:"weird",pos:"adjective",def:"very strange and unusual, unexpected, or not natural",zh:"奇怪的",sentences:["That's <mark>weird</mark>, I thought I left my keys on the table but they're not there.","He has a <mark>weird</mark> habit of talking to himself in public."]},
+        {word:"allies",pos:"plural noun",def:"someone who helps and supports someone else",zh:"盟友",sentences:["We need to become <mark>allies</mark> to solve this problem.","The two countries have been <mark>allies</mark> for over fifty years."]},
+        {word:"kingdom",pos:"noun",def:"one of the groups that natural things can be divided into, depending on their type",zh:"王國；界",sentences:["What do you know about the animal <mark>kingdom</mark>?","The plant <mark>kingdom</mark> includes trees, flowers, and grasses."]},
+        {word:"cluster",pos:"verb",def:"to form or gather together",zh:"聚集",sentences:["All of his grandchildren <mark>clustered</mark> around him.","Stars <mark>cluster</mark> together to form galaxies."]},
+        {word:"anemone",pos:"noun",def:"a soft, brightly colored sea creature that looks like a flower and often lives on rocks in the ocean",zh:"海葵",sentences:["At low tide you can explore the tide pools for crabs, starfish, and <mark>anemones</mark>.","The clownfish lives inside the <mark>anemone</mark> for protection."]}
       ]
     }
-    // ???啣??望活蝭?嚗?    // "Week 7": { unit:'H3-7.3', count:12, words:[...] }
+    // ★ 新增週次範例：
+    // "Week 7": { unit:'H3-7.3', count:12, words:[...] }
   },
   oliver: {}
-  // ???啣? Oliver ?望活蝭?嚗?  // oliver: { "Week 6": { unit:'B2-3.1', count:10, words:[...] } }
+  // ★ 新增 Oliver 週次範例：
+  // oliver: { "Week 6": { unit:'B2-3.1', count:10, words:[...] } }
 };
 
 // ===== STATE =====
@@ -555,7 +557,8 @@ function getCurrentBank(){
 }
 
 // ===== GOOGLE SHEETS CONFIG =====
-// ?????ㄐ??雿? Apps Script Web App URL ????const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu8SNnWG0ox2kF_c18dbMPT5doaL2-lEUuRjtmfDAxJOLYgolqb-FTaD-8cUf1OSj9/exec';
+// ★★★ 把這裡換成你的 Apps Script Web App URL ★★★
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu8SNnWG0ox2kF_c18dbMPT5doaL2-lEUuRjtmfDAxJOLYgolqb-FTaD-8cUf1OSj9/exec';
 
 // ===== RECORDS (Google Sheets + localStorage fallback) =====
 let cachedRecs = null;
@@ -571,8 +574,8 @@ async function saveRec(p,mph,mc,sp,mt,wrong,unit,week){
   if(APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'){
     try{
       await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(rec)});
-      console.log('??Record saved to Google Sheets');
-    }catch(e){console.warn('?? Google Sheets save failed, using local:',e)}
+      console.log('✅ Record saved to Google Sheets');
+    }catch(e){console.warn('⚠️ Google Sheets save failed, using local:',e)}
   }
 }
 
@@ -585,7 +588,7 @@ async function fetchCloudRecs(){
         cachedRecs = data.records;
         return data.records;
       }
-    }catch(e){console.warn('?? Cloud fetch failed, using local:',e)}
+    }catch(e){console.warn('⚠️ Cloud fetch failed, using local:',e)}
   }
   return getRecs();
 }
@@ -637,7 +640,7 @@ function renderDash(){
   });
 
   if(!b || weeks.length===0){
-    document.getElementById('d-sub').textContent='撠銝?桀?';
+    document.getElementById('d-sub').textContent='尚未上傳單字';
     document.getElementById('dash-content').classList.add('hidden');
     document.getElementById('week-empty').classList.remove('hidden');
     document.querySelector('.week-sel').classList.add('hidden');
@@ -647,12 +650,12 @@ function renderDash(){
   document.querySelector('.week-sel').classList.remove('hidden');
   document.getElementById('dash-content').classList.remove('hidden');
   document.getElementById('week-empty').classList.add('hidden');
-  document.getElementById('d-sub').textContent=b.unit+' 繚 '+currentWeek+' 繚 '+b.count+' words';
+  document.getElementById('d-sub').textContent=b.unit+' · '+currentWeek+' · '+b.count+' words';
   const g=document.getElementById('wg');g.innerHTML='';
   words.forEach(w=>{const d=document.createElement('div');d.className='wc';d.innerHTML=`<span class="dot"></span>${w.word}`;g.appendChild(d)});
 }
 
-// ===== TTS ??OPTIMIZED =====
+// ===== TTS — OPTIMIZED =====
 let bestVoice=null;
 function pickVoice(){
   const vs=speechSynthesis.getVoices();
@@ -679,16 +682,16 @@ function renderCard(){
   document.getElementById('l-prog').textContent=(li+1)+' / '+words.length;
   document.getElementById('l-bar').style.width=((li+1)/words.length*100)+'%';
   const btn=document.getElementById('l-next');
-  if(li===words.length-1){btn.textContent='?? Example Sentences ??;btn.className='btn-next gold'}
-  else{btn.textContent='Next ??;btn.className='btn-next'}
+  if(li===words.length-1){btn.textContent='📝 Example Sentences →';btn.className='btn-next gold'}
+  else{btn.textContent='Next →';btn.className='btn-next'}
   document.getElementById('l-area').innerHTML=`
     <div class="scard">
-      <div class="sc-top"><span class="sc-pos">${w.pos}</span><button class="btn-snd" onclick="playWord('${w.word}')">??</button></div>
+      <div class="sc-top"><span class="sc-pos">${w.pos}</span><button class="btn-snd" onclick="playWord('${w.word}')">🔊</button></div>
       <div class="sc-word">${w.word}</div>
       <div class="sc-div"></div>
-      <div class="sc-lbl en">?? ENGLISH DEFINITION</div>
+      <div class="sc-lbl en">📖 ENGLISH DEFINITION</div>
       <div class="sc-def">${w.def}</div>
-      <div class="sc-lbl zh">? 銝剜??內</div>
+      <div class="sc-lbl zh">💡 中文提示</div>
       <div class="sc-zh">${w.zh}</div>
     </div>`;
   setTimeout(()=>playWord(w.word),350);
@@ -702,18 +705,18 @@ function renderSent(){
   document.getElementById('s-prog').textContent=(si+1)+' / '+words.length;
   document.getElementById('s-bar').style.width=((si+1)/words.length*100)+'%';
   const btn=document.getElementById('s-next');
-  if(si===words.length-1){btn.textContent='? Start Quiz!';btn.className='btn-next gold'}
-  else{btn.textContent='Next ??;btn.className='btn-next'}
+  if(si===words.length-1){btn.textContent='🎯 Start Quiz!';btn.className='btn-next gold'}
+  else{btn.textContent='Next →';btn.className='btn-next'}
   const sh=w.sentences.map((s,i)=>`
     <div class="st-sent">${s}</div>
-    <button class="btn-listen" onclick="playSent(words[${si}].sentences[${i}])">?? Listen & repeat</button>
+    <button class="btn-listen" onclick="playSent(words[${si}].sentences[${i}])">🔊 Listen & repeat</button>
   `).join('');
   document.getElementById('s-area').innerHTML=`
     <div class="st-card">
-      <div class="st-wr"><div class="st-w">${w.word}</div><span class="st-pos">${w.pos}</span><button class="btn-snd-s" onclick="playWord('${w.word}')">??</button></div>
-      <div style="font-size:14px;color:var(--dim);margin-bottom:4px">?? ${w.def}</div>
-      <div style="font-size:13px;color:var(--gold);margin-bottom:16px">? ${w.zh}</div>
-      <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:12px">EXAMPLE SENTENCES ??Read aloud!</div>
+      <div class="st-wr"><div class="st-w">${w.word}</div><span class="st-pos">${w.pos}</span><button class="btn-snd-s" onclick="playWord('${w.word}')">🔊</button></div>
+      <div style="font-size:14px;color:var(--dim);margin-bottom:4px">📖 ${w.def}</div>
+      <div style="font-size:13px;color:var(--gold);margin-bottom:16px">💡 ${w.zh}</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:12px">EXAMPLE SENTENCES — Read aloud!</div>
       ${sh}
     </div>`;
 }
@@ -751,23 +754,23 @@ function renderQ(){
   if(qStep>=tot){showResults();return}
   const q=qQs[qStep],c=document.getElementById('q-content'),L=['A','B','C','D'];
   if(q.type==='mc'){
-    document.getElementById('q-phase').textContent='?儭?MULTIPLE CHOICE';
+    document.getElementById('q-phase').textContent='🅰️ MULTIPLE CHOICE';
     c.innerHTML=`<div class="qcard"><div class="ql">Q${qStep+1}/${tot}</div><div class="qt">Which word means:</div><div class="qs">"${q.word.def}"</div>
       <div class="mc-opts">${q.opts.map((o,i)=>`<button class="mc-o" onclick="ansMC(this,'${o.word}','${q.word.word}')"><span class="lt">${L[i]}</span><span>${o.word}</span></button>`).join('')}</div></div>`;
   } else if(q.type==='fill'){
-    document.getElementById('q-phase').textContent='?? FILL IN THE BLANK';
+    document.getElementById('q-phase').textContent='✏️ FILL IN THE BLANK';
     const raw=q.word.sentences[0].replace(/<\/?mark>/g,'');
     const blank=raw.replace(new RegExp(q.word.word,'gi'),'______');
     c.innerHTML=`<div class="qcard"><div class="ql">Q${qStep+1}/${tot}</div><div class="qt">Fill in the blank:</div>
       <div class="fill-s">${blank}</div>
-      <div class="fill-h">? Hint: <span>${fillHint(q.word.word)}</span> (${q.word.word.length} letters)</div>
-      <div style="font-size:13px;color:var(--dim);margin-bottom:14px">?? ${q.word.def}</div>
-      <div class="fill-row"><button class="btn-hear" onclick="playWord('${q.word.word}')">??</button>
+      <div class="fill-h">💡 Hint: <span>${fillHint(q.word.word)}</span> (${q.word.word.length} letters)</div>
+      <div style="font-size:13px;color:var(--dim);margin-bottom:14px">📖 ${q.word.def}</div>
+      <div class="fill-row"><button class="btn-hear" onclick="playWord('${q.word.word}')">🔊</button>
       <input class="fill-in" id="fi" type="text" placeholder="Type the word..." autocomplete="off">
       <button class="btn-chk" onclick="ansFill()">Check</button></div></div>`;
     setTimeout(()=>{playWord(q.word.word);const i=document.getElementById('fi');if(i){i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')ansFill()})}},300);
   } else {
-    document.getElementById('q-phase').textContent='?? MATCHING';
+    document.getElementById('q-phase').textContent='🔗 MATCHING';
     const ds=[...q.ws].sort(()=>Math.random()-.5);
     c.innerHTML=`<div class="qcard"><div class="ql">Match words with definitions</div>
       <div class="match-c"><div><div class="match-cl">Words</div><div class="match-is" id="mw">${q.ws.map(w=>`<div class="mi" data-w="${w.word}" onclick="selMW(this)">${w.word}</div>`).join('')}</div></div>
@@ -779,25 +782,25 @@ function renderQ(){
 function ansMC(btn,ch,cor){
   btn.parentElement.querySelectorAll('.mc-o').forEach(o=>{o.classList.add('ans');o.style.pointerEvents='none';
     const w=o.querySelector('span:last-child').textContent;if(w===cor)o.classList.add('ok');if(w===ch&&ch!==cor)o.classList.add('no')});
-  if(ch===cor){qScore.mc+=20;fb('correct','??Correct! +20')}else{fb('wrong','??Answer: "'+cor+'"');if(!qWrong.includes(cor))qWrong.push(cor)}
+  if(ch===cor){qScore.mc+=20;fb('correct','✅ Correct! +20')}else{fb('wrong','❌ Answer: "'+cor+'"');if(!qWrong.includes(cor))qWrong.push(cor)}
   setTimeout(()=>{qStep++;renderQ()},1500);
 }
 function ansFill(){
   const inp=document.getElementById('fi');if(!inp)return;const q=qQs[qStep],a=inp.value.trim().toLowerCase(),cor=q.word.word.toLowerCase();
-  if(a===cor){inp.classList.add('ok');qScore.sp+=20;fb('correct','??Correct! +20')}
-  else{inp.classList.add('no');fb('wrong','??Answer: "'+q.word.word+'"');if(!qWrong.includes(q.word.word))qWrong.push(q.word.word)}
+  if(a===cor){inp.classList.add('ok');qScore.sp+=20;fb('correct','✅ Correct! +20')}
+  else{inp.classList.add('no');fb('wrong','❌ Answer: "'+q.word.word+'"');if(!qWrong.includes(q.word.word))qWrong.push(q.word.word)}
   inp.disabled=true;document.querySelector('.btn-chk').disabled=true;
   setTimeout(()=>{qStep++;renderQ()},1800);
 }
 function selMW(el){if(el.classList.contains('done'))return;document.querySelectorAll('#mw .mi').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');window._ms.sel=el.dataset.w}
 function selMD(el){
   if(el.classList.contains('done')||!window._ms.sel)return;const s=window._ms,we=document.querySelector('#mw .mi.sel');
-  if(el.dataset.w===s.sel){el.classList.add('done');we.classList.add('done');we.classList.remove('sel');s.done++;qScore.mt+=10;fb('correct','??Match! +10');s.sel=null;
+  if(el.dataset.w===s.sel){el.classList.add('done');we.classList.add('done');we.classList.remove('sel');s.done++;qScore.mt+=10;fb('correct','✅ Match! +10');s.sel=null;
     if(s.done>=s.tot)setTimeout(()=>{qStep++;renderQ()},1000)}
-  else{el.classList.add('err');fb('wrong','??Try again!');if(!qWrong.includes(s.sel))qWrong.push(s.sel);setTimeout(()=>el.classList.remove('err'),500)}
+  else{el.classList.add('err');fb('wrong','❌ Try again!');if(!qWrong.includes(s.sel))qWrong.push(s.sel);setTimeout(()=>el.classList.remove('err'),500)}
 }
 
-// ===== RESULTS ??BASEBALL ANIMATION =====
+// ===== RESULTS — BASEBALL ANIMATION =====
 function showResults(){
   showScreen('screen-results');
   const raw=qScore.mc+qScore.sp+qScore.mt, max=5*20+5*20+5*10, mph=Math.round(raw/max*100);
@@ -811,10 +814,10 @@ function showResults(){
   document.getElementById('rp-num').textContent=player==='murphy'?'17':'17';
 
   let rType,big,sub;
-  if(mph>=95){rType='k';big='STRIKEOUT!';sub='摰銝嚗???鈭綽??'}
-  else if(mph>=90){rType='k';big='STRIKEOUT!';sub='銝?箏?嚗末????}
-  else if(mph>=85){rType='h';big='BASE HIT';sub='鋡急??箏???..銝活?硃 ?'}
-  else{rType='hr';big='HOME RUN!';sub='鋡急??箏憯?嚗?閬憭毀蝧??'}
+  if(mph>=95){rType='k';big='STRIKEOUT!';sub='完全三振！球速驚人！🔥'}
+  else if(mph>=90){rType='k';big='STRIKEOUT!';sub='三振出局！好球！⚡'}
+  else if(mph>=85){rType='h';big='BASE HIT';sub='被打出安打...下次加油 💪'}
+  else{rType='hr';big='HOME RUN!';sub='被打出全壘打！需要更多練習 😤'}
 
   // Reset
   const rp=document.getElementById('rp'),rb=document.getElementById('r-ball'),bat=document.getElementById('r-batter'),
@@ -838,15 +841,15 @@ function showResults(){
     const sb=document.getElementById('sp-box');sb.style.opacity='1';sb.style.transition='opacity .5s';
     animNum('sp-num',0,mph,1200);
     const l=document.getElementById('sp-lbl');
-    if(mph>=95)l.textContent='? Dominant Pitch!';else if(mph>=90)l.textContent='??Nasty Fastball!';
-    else if(mph>=85)l.textContent='? Decent Speed';else l.textContent='?? Needs More Practice';
+    if(mph>=95)l.textContent='🔥 Dominant Pitch!';else if(mph>=90)l.textContent='⚡ Nasty Fastball!';
+    else if(mph>=85)l.textContent='💪 Decent Speed';else l.textContent='📚 Needs More Practice';
   },3200);
   setTimeout(()=>{
     const rs=document.getElementById('r-stats-wrap');rs.style.opacity='1';rs.style.transition='opacity .5s';
     document.getElementById('r-mc').textContent=qScore.mc;document.getElementById('r-sp').textContent=qScore.sp;document.getElementById('r-mt').textContent=qScore.mt;
     const ws=document.getElementById('wr-sec');
-    if(qWrong.length)ws.innerHTML=`<h4>?? ?閬?蝧?</h4>${qWrong.map(w=>`<span class="wr-chip">${w}</span>`).join('')}`;
-    else ws.innerHTML='<h4 style="color:var(--green)">?? Perfect Game!</h4>';
+    if(qWrong.length)ws.innerHTML=`<h4>📝 需要複習：</h4>${qWrong.map(w=>`<span class="wr-chip">${w}</span>`).join('')}`;
+    else ws.innerHTML='<h4 style="color:var(--green)">🎉 Perfect Game!</h4>';
   },4200);
 }
 
@@ -864,24 +867,24 @@ function adminTab(tab){
   renderAdmin(tab);
 }
 async function renderAdmin(f){
-  document.getElementById('a-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--dim)">??Loading records...</div>';
+  document.getElementById('a-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--dim)">⏳ Loading records...</div>';
   let recs = await fetchCloudRecs();
   if(f!=='all')recs=recs.filter(r=>r.player===f);
   const c=document.getElementById('a-content');
-  if(!recs.length){c.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--dim)"><div style="font-size:48px;margin-bottom:16px">?</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">No records yet</div><div style="font-size:14px">皜祇?閮??摰?皜祇?敺??整?/div></div>';return}
+  if(!recs.length){c.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--dim)"><div style="font-size:48px;margin-bottom:16px">📭</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">No records yet</div><div style="font-size:14px">測驗記錄會在完成測驗後自動出現。</div></div>';return}
   const mphs=recs.map(r=>r.mph),avg=Math.round(mphs.reduce((a,b)=>a+b,0)/mphs.length),best=Math.max(...mphs),
     trend=mphs.length>=2?mphs[mphs.length-1]-mphs[0]:0;
-  let tc='t-fl',ti='??;if(trend>0){tc='t-up';ti='??+'+trend}else if(trend<0){tc='t-dn';ti='??'+trend}
-  let h=`<div class="sum-cards"><div class="sum-c"><div class="sv">${avg}</div><div class="sl">撟喳???/div></div><div class="sum-c"><div class="sv" style="color:var(--green)">${best}</div><div class="sl">?雿喟???/div></div><div class="sum-c"><div class="sv ${tc}">${ti}</div><div class="sl">?脫郊撟漲</div></div></div>`;
-  h+=`<div class="chart-box"><h3>?? ?隅??/h3><div class="bars">`;
+  let tc='t-fl',ti='→';if(trend>0){tc='t-up';ti='↑ +'+trend}else if(trend<0){tc='t-dn';ti='↓ '+trend}
+  let h=`<div class="sum-cards"><div class="sum-c"><div class="sv">${avg}</div><div class="sl">平均球速</div></div><div class="sum-c"><div class="sv" style="color:var(--green)">${best}</div><div class="sl">最佳球速</div></div><div class="sum-c"><div class="sv ${tc}">${ti}</div><div class="sl">進步幅度</div></div></div>`;
+  h+=`<div class="chart-box"><h3>📈 球速趨勢</h3><div class="bars">`;
   recs.slice(-12).forEach(r=>{const d=new Date(r.date),ds=(d.getMonth()+1)+'/'+d.getDate(),bc=r.player==='murphy'?'mb':'ob';
     h+=`<div class="bar-w"><div class="bar-vl">${r.mph}</div><div class="bar ${bc}" style="height:${Math.max(r.mph*1.4,8)}px"></div><div class="bar-lb">${ds}</div></div>`});
   h+=`</div></div>`;
-  h+=`<div class="chart-box"><h3>?? 皜祇?閮?</h3><div style="overflow-x:auto"><table class="rtable"><tr><th>?交?</th><th>摮詨</th><th>?桀?</th><th>??/th><th>蝯?</th><th>?豢?</th><th>憛怎征</th><th>??</th><th>?航炊?桀?</th></tr>`;
+  h+=`<div class="chart-box"><h3>📋 測驗記錄</h3><div style="overflow-x:auto"><table class="rtable"><tr><th>日期</th><th>學員</th><th>單元</th><th>球速</th><th>結果</th><th>選擇</th><th>填空</th><th>配對</th><th>錯誤單字</th></tr>`;
   [...recs].reverse().forEach(r=>{
     const d=new Date(r.date),ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
     let mc='mph-l',badge='rhr',bt='HOME RUN';if(r.mph>=90){mc='mph-h';badge='rk';bt='STRIKEOUT'}else if(r.mph>=85){mc='mph-m';badge='rh';bt='BASE HIT'}
-    h+=`<tr><td>${ds}</td><td style="font-weight:600;color:${r.player==='murphy'?'var(--blue)':'var(--red)'}">${r.player==='murphy'?'Murphy':'Oliver'}</td><td>${r.unit||''}</td><td class="${mc}">${r.mph}</td><td><span class="rb ${badge}">${bt}</span></td><td>${r.mc}</td><td>${r.sp}</td><td>${r.mt}</td><td style="font-size:11px;color:var(--dim);max-width:140px">${r.wrong&&r.wrong.length?r.wrong.join(', '):'??}</td></tr>`;
+    h+=`<tr><td>${ds}</td><td style="font-weight:600;color:${r.player==='murphy'?'var(--blue)':'var(--red)'}">${r.player==='murphy'?'Murphy':'Oliver'}</td><td>${r.unit||''}</td><td class="${mc}">${r.mph}</td><td><span class="rb ${badge}">${bt}</span></td><td>${r.mc}</td><td>${r.sp}</td><td>${r.mt}</td><td style="font-size:11px;color:var(--dim);max-width:140px">${r.wrong&&r.wrong.length?r.wrong.join(', '):'—'}</td></tr>`;
   });
   h+=`</table></div></div>`;
   c.innerHTML=h;
@@ -892,9 +895,9 @@ function fb(type,msg){const el=document.getElementById('feedback');el.className=
 // Connection status
 async function checkConnection(){
   const el=document.getElementById('conn-status');
-  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){el.textContent='?? Local mode (?芾身摰?Google Sheets)';el.style.color='var(--gold)';return}
-  try{const r=await fetch(APPS_SCRIPT_URL);const d=await r.json();if(d.status==='ok'){el.textContent='? Connected to Google Sheets';el.style.color='var(--green)'}else throw new Error()}
-  catch(e){el.textContent='? Cloud unavailable (using local)';el.style.color='var(--err)'}
+  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){el.textContent='⚠️ Local mode (未設定 Google Sheets)';el.style.color='var(--gold)';return}
+  try{const r=await fetch(APPS_SCRIPT_URL);const d=await r.json();if(d.status==='ok'){el.textContent='🟢 Connected to Google Sheets';el.style.color='var(--green)'}else throw new Error()}
+  catch(e){el.textContent='🔴 Cloud unavailable (using local)';el.style.color='var(--err)'}
 }
 
 // ===== PHOTO UPLOAD =====
@@ -906,7 +909,7 @@ function openUpload(who){
   uploadTarget = who;
   uploadBase64 = null;
   uploadFileName = null;
-  document.getElementById('upload-title').textContent = '? ' + (who==='murphy'?'Murphy':'Oliver') + ' 銝?桀??抒?';
+  document.getElementById('upload-title').textContent = '📷 ' + (who==='murphy'?'Murphy':'Oliver') + ' 上傳單字照片';
   document.getElementById('upload-preview').style.display='none';
   document.getElementById('upload-zone').style.display='block';
   document.getElementById('upload-status').textContent='';
@@ -934,7 +937,7 @@ function handleFile(input){
     prev.src = uploadBase64;
     prev.style.display = 'block';
     document.getElementById('upload-zone').style.display='none';
-    document.getElementById('upload-status').textContent='???抒?撌脤??暺??喋';
+    document.getElementById('upload-status').textContent='✅ 照片已選取，點「上傳」送出';
     document.getElementById('upload-status').className='upload-status ok';
     document.getElementById('btn-send').disabled=false;
   };
@@ -947,12 +950,12 @@ async function sendUpload(){
   const statusEl = document.getElementById('upload-status');
   const btnSend = document.getElementById('btn-send');
   btnSend.disabled = true;
-  statusEl.textContent = '??銝銝?..';
+  statusEl.textContent = '⏳ 上傳中...';
   statusEl.className = 'upload-status wait';
 
   // Check if Apps Script URL is set
   if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE'){
-    statusEl.textContent = '?? 撠閮剖? Google Sheets URL嚗????蝵脰身摰?;
+    statusEl.textContent = '⚠️ 尚未設定 Google Sheets URL，請先完成部署設定';
     statusEl.className = 'upload-status err';
     btnSend.disabled = false;
     return;
@@ -975,9 +978,9 @@ async function sendUpload(){
     });
 
     // no-cors mode = opaque response, but data is sent
-    statusEl.textContent = '? 撌脖??喉??葦? Google Drive 銝剔??啁??;
+    statusEl.textContent = '🟢 已上傳！老師會在 Google Drive 中看到照片';
     statusEl.className = 'upload-status ok';
-    fb('correct','? ?抒?銝??嚗?);
+    fb('correct','📷 照片上傳成功！');
 
     // Also save a local record
     const localUploads = JSON.parse(localStorage.getItem('vq_uploads')||'[]');
@@ -987,7 +990,7 @@ async function sendUpload(){
     setTimeout(()=>closeUpload(), 2000);
   } catch(e) {
     console.warn('Upload failed:', e);
-    statusEl.textContent = '? 銝憭望?嚗?蝣箄?蝬脰楝???敺?閰?;
+    statusEl.textContent = '🔴 上傳失敗，請確認網路連線後重試';
     statusEl.className = 'upload-status err';
     btnSend.disabled = false;
   }
