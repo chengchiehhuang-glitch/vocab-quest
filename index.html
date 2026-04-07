@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Quest</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+:root {
+  --bg:#0c0e16;--surface:#151823;--surface2:#1c2033;--surface3:#242940;
+  --blue:#2b7de9;--blue-l:#5ea1ff;--red:#e8443a;--gold:#f5a623;
+  --green:#34d399;--err:#ef4444;--purple:#a78bfa;--cyan:#22d3ee;--orange:#fb923c;
+  --text:#e8eaf0;--dim:#6b7194;--mid:#9ca3c0;--border:#2a2f45;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter','Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden}
+.hidden{display:none!important}
+button{font-family:inherit}
+
+/* ===== HOME BUTTON (global) ===== */
+.home-btn{
+  position:fixed;top:16px;left:16px;z-index:900;
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--border);
+  background:var(--surface);color:var(--dim);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.home-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,166,35,0.08)}
+
+/* ===== SELECT ===== */
+#screen-select{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;background:radial-gradient(ellipse at 50% 30%,rgba(43,125,233,0.08) 0%,transparent 60%)}
+.sel-title{font-family:'Space Grotesk';font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:-1px;margin-bottom:6px;text-align:center}
+.sel-title span{color:var(--gold)}
+.sel-sub{color:var(--dim);font-size:15px;margin-bottom:48px;text-align:center}
+.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:640px;width:100%}
+.char-card{background:var(--surface);border:2px solid var(--border);border-radius:20px;padding:36px 24px 28px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.char-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;opacity:0;transition:opacity .3s}
+.char-card.m::before{background:var(--blue)}.char-card.o::before{background:var(--red)}
+.char-card:hover{transform:translateY(-4px)}.char-card:hover::before{opacity:1}
+.char-card.m:hover{border-color:var(--blue);box-shadow:0 8px 32px rgba(43,125,233,.15)}
+.char-card.o:hover{border-color:var(--red);box-shadow:0 8px 32px rgba(232,68,58,.15)}
+.ch-av{width:100px;height:100px;border-radius:50%;margin:0 auto 16px;background-size:cover;background-position:center top}
+.ch-av.m{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/808967/headshot/67/current');background-color:rgba(43,125,233,.15)}
+.ch-av.o{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/660271/headshot/67/current');background-color:rgba(232,68,58,.15)}
+.ch-name{font-family:'Space Grotesk';font-size:22px;font-weight:700;margin-bottom:4px}
+.ch-lvl{font-size:13px;color:var(--dim);margin-bottom:8px}
+.ch-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px}
+.char-card.m .ch-badge{background:rgba(43,125,233,.15);color:var(--blue)}
+.char-card.o .ch-badge{background:rgba(232,68,58,.15);color:var(--red)}
+.admin-link{margin-top:40px;padding:8px 20px;border:1px solid var(--border);border-radius:8px;background:0;color:var(--dim);font-size:12px;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.admin-link:hover{border-color:var(--gold);color:var(--gold)}
+.no-data-msg{margin-top:24px;padding:16px 24px;border:1px dashed var(--border);border-radius:12px;color:var(--dim);font-size:13px;text-align:center;max-width:400px}
+
+/* Upload button on cards */
+.btn-upload{
+  margin-top:12px;padding:8px 16px;border:1px dashed var(--gold);border-radius:10px;
+  background:rgba(245,166,35,.06);color:var(--gold);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-upload:hover{background:rgba(245,166,35,.15);border-style:solid}
+.upload-input{display:none}
+
+/* Upload modal */
+.upload-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.upload-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:32px 24px;max-width:420px;width:100%;text-align:center;animation:fadeIn .3s ease;
+}
+.upload-box h3{font-family:'Space Grotesk';font-size:20px;font-weight:700;margin-bottom:8px}
+.upload-box .sub{font-size:13px;color:var(--dim);margin-bottom:24px}
+.upload-zone{
+  border:2px dashed var(--border);border-radius:16px;padding:40px 20px;cursor:pointer;
+  transition:all .2s;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.upload-zone:hover{border-color:var(--gold);background:rgba(245,166,35,.04)}
+.upload-zone .icon{font-size:48px;margin-bottom:8px}
+.upload-zone .hint{font-size:14px;color:var(--dim)}
+.upload-zone .hint b{color:var(--gold)}
+.upload-preview{max-width:100%;max-height:240px;border-radius:12px;margin-bottom:16px;display:none}
+.upload-status{font-size:13px;color:var(--dim);margin-bottom:16px;min-height:20px}
+.upload-status.ok{color:var(--green)}.upload-status.err{color:var(--err)}.upload-status.wait{color:var(--gold)}
+.upload-btns{display:flex;gap:10px;justify-content:center}
+.upload-btns button{padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+.btn-send{background:var(--gold);color:#1a1a2e}.btn-send:hover{filter:brightness(1.1)}
+.btn-send:disabled{opacity:.4;cursor:not-allowed}
+.btn-cancel{background:var(--surface2);color:var(--dim);border:1px solid var(--border)!important}.btn-cancel:hover{color:var(--text)}
+
+/* ===== DASHBOARD ===== */
+#screen-dash{min-height:100vh;padding:24px 20px;max-width:800px;margin:0 auto}
+.week-sel{display:flex;align-items:center;gap:10px;margin:16px 0 8px;flex-wrap:wrap}
+.week-sel label{font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.5px}
+.week-sel select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:14px;font-family:inherit;cursor:pointer;outline:none;transition:border-color .2s;min-width:140px}
+.week-sel select:focus{border-color:var(--gold)}
+.week-sel select:hover{border-color:var(--blue-l)}
+.week-empty{text-align:center;padding:40px 20px;color:var(--dim);font-size:14px;line-height:1.8}
+.d-head{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.d-av{width:56px;height:56px;border-radius:50%;background-size:cover;background-position:center top;flex-shrink:0}
+.d-av.m{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/808967/headshot/67/current');background-color:rgba(43,125,233,.15)}
+.d-av.o{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/660271/headshot/67/current');background-color:rgba(232,68,58,.15)}
+.d-info h2{font-family:'Space Grotesk';font-size:22px;font-weight:700}
+.d-info p{color:var(--dim);font-size:13px}
+.wl-title{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.wc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.wc .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.btn-go{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--blue);color:#fff}
+.btn-go:hover{background:var(--blue-l);transform:translateY(-1px)}
+.btn-go.gold{background:var(--gold);color:#1a1a2e}
+
+/* ===== LEARN / SENTENCES shared ===== */
+.page-wrap{min-height:100vh;display:flex;flex-direction:column;padding:60px 20px 20px;max-width:620px;margin:0 auto}
+.top-bar{display:flex;align-items:center;justify-content:flex-end;margin-bottom:12px}
+.prog-info{font-size:13px;color:var(--dim);font-weight:500}
+.prog-wrap{width:100%;height:6px;background:var(--surface2);border-radius:3px;margin-bottom:24px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.prog-fill.blue{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.prog-fill.purple{background:linear-gradient(90deg,var(--purple),var(--gold))}
+
+/* Study card */
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;margin-bottom:20px;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sc-pos{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(43,125,233,.15);color:var(--blue)}
+.btn-snd{width:48px;height:48px;border-radius:50%;border:2px solid var(--blue);background:rgba(43,125,233,.1);color:var(--blue);font-size:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.btn-snd:hover{background:var(--blue);color:#fff;transform:scale(1.1)}
+.btn-snd.playing{animation:pulse .8s ease infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(43,125,233,.4)}100%{box-shadow:0 0 0 14px rgba(43,125,233,0)}}
+.sc-word{font-family:'Space Grotesk';font-size:clamp(38px,9vw,56px);font-weight:700;letter-spacing:-1px;margin:8px 0 20px}
+.sc-div{height:1px;background:var(--border);margin-bottom:20px}
+.sc-lbl{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.sc-lbl.en{color:var(--blue)}.sc-lbl.zh{color:var(--gold);margin-top:16px}
+.sc-def{font-size:16px;line-height:1.7;color:var(--mid)}
+.sc-zh{font-size:15px;color:var(--gold);background:rgba(245,166,35,.08);padding:8px 16px;border-radius:10px;display:inline-block;margin-top:6px}
+.btn-next{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--blue);color:#fff}
+.btn-next:hover{background:var(--blue-l);transform:translateY(-1px)}
+.btn-next.gold{background:var(--gold);color:#1a1a2e}
+
+/* Sentence card */
+.st-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 24px;margin-bottom:16px;animation:fadeIn .35s ease}
+.st-wr{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.st-w{font-family:'Space Grotesk';font-size:26px;font-weight:700}
+.st-pos{padding:3px 10px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(43,125,233,.12);color:var(--blue)}
+.btn-snd-s{width:36px;height:36px;border-radius:50%;border:1px solid var(--blue);background:rgba(43,125,233,.1);color:var(--blue);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-left:auto}
+.btn-snd-s:hover{background:var(--blue);color:#fff}
+.st-sent{font-size:17px;line-height:1.8;color:var(--mid);padding:14px 18px;background:var(--surface2);border-radius:12px;border-left:3px solid var(--blue);margin-bottom:10px}
+.st-sent mark{background:rgba(43,125,233,.2);color:var(--blue-l);padding:1px 4px;border-radius:3px}
+.btn-listen{margin-bottom:14px;padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--dim);font-size:13px;cursor:pointer;transition:all .2s}
+.btn-listen:hover{color:var(--text);border-color:var(--mid)}
+
+/* ===== QUIZ ===== */
+#screen-quiz{min-height:100vh;padding:60px 20px 20px;max-width:620px;margin:0 auto}
+.q-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.q-phase{font-size:12px;font-weight:600;color:var(--purple);letter-spacing:.5px;text-transform:uppercase}
+.q-pts{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.q-pts .v{color:var(--gold)}
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 24px;margin-bottom:20px}
+.ql{font-size:12px;color:var(--dim);margin-bottom:10px}
+.qt{font-size:20px;font-weight:600;line-height:1.5;margin-bottom:6px}
+.qs{font-size:14px;color:var(--mid);margin-bottom:24px;line-height:1.6}
+.mc-opts{display:grid;gap:10px}
+.mc-o{padding:14px 18px;border:2px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text);font-size:15px;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:12px}
+.mc-o:hover:not(.ans){border-color:var(--blue);background:rgba(43,125,233,.05)}
+.mc-o .lt{width:28px;height:28px;border-radius:8px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0}
+.mc-o.ok{border-color:var(--green);background:rgba(52,211,153,.08)}.mc-o.ok .lt{background:var(--green);color:#042f2e}
+.mc-o.no{border-color:var(--err);background:rgba(239,68,68,.08)}.mc-o.no .lt{background:var(--err);color:#fff}
+.fill-s{font-size:17px;line-height:1.9;color:var(--mid);margin-bottom:18px;padding:16px 20px;background:var(--surface2);border-radius:12px;border-left:3px solid var(--purple)}
+.fill-h{font-size:13px;color:var(--dim);margin-bottom:14px;padding:8px 14px;background:rgba(167,139,250,.08);border-radius:8px;display:inline-block}
+.fill-h span{color:var(--purple);font-weight:600;font-family:'Space Grotesk',monospace;letter-spacing:2px}
+.fill-row{display:flex;gap:10px;align-items:center}
+.fill-in{flex:1;padding:14px 18px;border:2px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text);font-size:18px;font-family:'Space Grotesk',monospace;letter-spacing:2px;outline:none;transition:border-color .2s}
+.fill-in:focus{border-color:var(--purple)}.fill-in.ok{border-color:var(--green)}.fill-in.no{border-color:var(--err)}
+.btn-chk{padding:14px 28px;border:none;border-radius:12px;background:var(--purple);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-chk:hover{filter:brightness(1.2)}
+.btn-hear{width:44px;height:44px;border-radius:50%;border:1px solid var(--blue);background:rgba(43,125,233,.1);color:var(--blue);font-size:18px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.btn-hear:hover{background:var(--blue);color:#fff}
+.match-c{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.match-cl{font-size:11px;font-weight:600;letter-spacing:1px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;text-align:center}
+.match-is{display:grid;gap:8px}
+.mi{padding:12px 14px;border:2px solid var(--border);border-radius:10px;background:var(--surface2);font-size:13px;cursor:pointer;text-align:center;transition:all .2s;user-select:none;min-height:48px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+.mi:hover:not(.done):not(.sel){border-color:var(--dim)}.mi.sel{border-color:var(--blue);background:rgba(43,125,233,.1)}
+.mi.done{border-color:var(--green);background:rgba(52,211,153,.08);opacity:.6;cursor:default}
+.mi.err{animation:shake .4s ease;border-color:var(--err)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.feedback{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);padding:12px 28px;border-radius:12px;font-size:15px;font-weight:600;z-index:999;transition:transform .3s ease;pointer-events:none}
+.feedback.show{transform:translateX(-50%) translateY(0)}.feedback.correct{background:var(--green);color:#042f2e}.feedback.wrong{background:var(--err);color:#fff}
+
+/* ===== RESULTS — FULL BASEBALL SCENE ===== */
+#screen-results{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;position:relative;overflow:hidden}
+
+/* Baseball diamond SVG field */
+.baseball-field{
+  width:100%;max-width:560px;height:400px;position:relative;z-index:1;
+  margin-top:40px;margin-bottom:20px;
+  background:radial-gradient(ellipse at 50% 85%,#1a3d1a 0%,#0e260e 40%,var(--bg) 75%);
+  border-radius:20px;overflow:hidden;border:1px solid rgba(52,211,153,.1);
+}
+
+/* Infield dirt */
+.infield{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  width:200px;height:200px;
+  background:radial-gradient(circle,#5a4630 0%,#3d3020 60%,transparent 70%);
+  border-radius:50%;opacity:.5;
+}
+
+/* Bases */
+.base{position:absolute;width:12px;height:12px;background:#fff;transform:rotate(45deg)}
+.base.home{bottom:40px;left:50%;margin-left:-6px}
+.base.first{bottom:120px;right:28%;margin-right:-6px}
+.base.second{top:100px;left:50%;margin-left:-6px}
+.base.third{bottom:120px;left:28%;margin-left:-6px}
+
+/* Mound */
+.r-mound{
+  position:absolute;bottom:140px;left:50%;transform:translateX(-50%);
+  width:50px;height:14px;background:linear-gradient(#8B7355,#6B5340);border-radius:50%;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Pitcher figure */
+.r-pitcher{
+  position:absolute;bottom:154px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;z-index:5;
+}
+.r-pitcher.throw{animation:pitchWindup .8s ease-out}
+@keyframes pitchWindup{
+  0%{transform:translateX(-50%) rotate(0) translateY(0)}
+  20%{transform:translateX(-50%) rotate(-8deg) translateY(-12px)}
+  45%{transform:translateX(-50%) rotate(-20deg) translateY(-16px)}
+  65%{transform:translateX(-50%) rotate(15deg) translateY(-4px)}
+  85%{transform:translateX(-50%) rotate(5deg) translateY(0)}
+  100%{transform:translateX(-50%) rotate(0) translateY(0)}
+}
+.p-head{width:30px;height:30px;border-radius:50%;background-size:cover;background-position:center top;border:2px solid var(--blue)}
+.p-head.m{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/808967/headshot/67/current');background-color:rgba(43,125,233,.3)}
+.p-head.o{background-image:url('https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/660271/headshot/67/current');background-color:rgba(232,68,58,.3);border-color:var(--red)}
+.p-body{width:24px;height:44px;border-radius:6px 6px 3px 3px;margin-top:-2px;position:relative;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-size:11px;font-weight:700;color:#fff}
+.p-body.m{background:var(--blue)}.p-body.o{background:var(--red)}
+.p-arm-r{position:absolute;top:8px;right:-14px;width:16px;height:5px;background:currentColor;border-radius:3px;transform-origin:left center}
+.p-arm-l{position:absolute;top:8px;left:-14px;width:16px;height:5px;background:currentColor;border-radius:3px;transform-origin:right center}
+.p-legs{display:flex;gap:4px;margin-top:-1px}
+.p-legs div{width:8px;height:22px;background:#ccc;border-radius:0 0 3px 3px}
+
+/* Ball */
+.r-ball{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#ddd 60%,#bbb);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  bottom:200px;left:50%;margin-left:-7px;opacity:0;z-index:10;
+}
+.r-ball.go{animation:ballTravel .7s cubic-bezier(.15,0,.4,1) forwards}
+@keyframes ballTravel{
+  0%{bottom:200px;opacity:1;width:14px;height:14px;margin-left:-7px}
+  100%{bottom:60px;opacity:1;width:10px;height:10px;margin-left:-5px}
+}
+
+/* Batter */
+.r-batter{
+  position:absolute;bottom:38px;right:32%;z-index:6;
+  font-size:0;display:flex;flex-direction:column;align-items:center;
+}
+.b-body{width:20px;height:36px;background:#aaa;border-radius:4px;position:relative}
+.b-head{width:18px;height:18px;border-radius:50%;background:#ddd;margin-bottom:-2px}
+.b-bat{position:absolute;top:4px;left:-20px;width:24px;height:4px;background:linear-gradient(#c4a06a,#a0824e);border-radius:2px;transform-origin:right center;transition:transform .1s}
+.b-legs{display:flex;gap:3px;margin-top:-1px}.b-legs div{width:7px;height:18px;background:#888;border-radius:0 0 2px 2px}
+
+.r-batter.swing .b-bat{animation:batSwing .35s ease forwards}
+@keyframes batSwing{0%{transform:rotate(0)}30%{transform:rotate(-60deg)}60%{transform:rotate(-80deg)}100%{transform:rotate(-70deg)}}
+.r-batter.miss .b-bat{animation:batMiss .5s ease forwards}
+@keyframes batMiss{0%{transform:rotate(0)}25%{transform:rotate(-70deg)}50%{transform:rotate(-90deg)}100%{transform:rotate(-85deg)}}
+.r-batter.miss .b-body{animation:missStagger .5s ease forwards}
+@keyframes missStagger{0%{transform:rotate(0)}50%{transform:rotate(-15deg) translateX(-4px)}100%{transform:rotate(-10deg) translateX(-3px)}}
+
+/* Hit ball fly */
+.hit-ball{
+  position:absolute;width:10px;height:10px;border-radius:50%;
+  background:#fff;box-shadow:0 0 16px rgba(255,255,255,.6);
+  opacity:0;z-index:15;pointer-events:none;
+}
+.hit-ball.single{animation:singleFly 1s ease-out forwards}
+@keyframes singleFly{0%{bottom:60px;left:50%;opacity:1}100%{bottom:200px;left:30%;opacity:0}}
+.hit-ball.homer{animation:homerFly 1.4s ease-out forwards}
+@keyframes homerFly{0%{bottom:60px;left:50%;opacity:1}40%{bottom:350px;left:25%;opacity:1}100%{bottom:500px;left:10%;opacity:0}}
+
+/* K stamp */
+.k-stamp{
+  position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) scale(0);
+  font-family:'Space Grotesk';font-size:120px;font-weight:900;color:var(--green);
+  opacity:0;z-index:20;pointer-events:none;text-shadow:0 0 60px rgba(52,211,153,.5);
+}
+.k-stamp.show{animation:kPop .6s cubic-bezier(.17,.89,.32,1.28) forwards}
+@keyframes kPop{0%{opacity:0;transform:translate(-50%,-50%) scale(3) rotate(-20deg)}60%{opacity:1;transform:translate(-50%,-50%) scale(.9) rotate(3deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
+
+/* Result text overlay */
+.r-overlay{position:absolute;top:18%;left:50%;transform:translateX(-50%);text-align:center;opacity:0;z-index:20;transition:opacity .5s;white-space:nowrap}
+.r-overlay.show{opacity:1}
+.r-big{font-family:'Space Grotesk';font-weight:900;font-size:clamp(36px,10vw,64px);letter-spacing:-2px;text-shadow:0 4px 24px rgba(0,0,0,.6)}
+.r-big.k{color:var(--green)}.r-big.h{color:var(--err)}.r-big.hr{color:var(--orange)}
+.r-sub{font-size:16px;color:var(--mid);margin-top:4px}
+
+/* Speed gauge */
+.speed-box{text-align:center;margin-bottom:16px;z-index:1;position:relative}
+.sp-num{font-family:'Space Grotesk';font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sp-unit{font-size:18px;color:var(--dim);font-weight:600}
+.sp-lbl{font-size:14px;color:var(--dim);margin-top:2px}
+
+/* Stats card */
+.r-stats{width:100%;max-width:560px;z-index:1;position:relative}
+.r-stats-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px}
+.rs-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.rs-i{background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center}
+.rs-i .ic{font-size:16px;margin-bottom:2px}.rs-i .vl{font-family:'Space Grotesk';font-size:18px;font-weight:700}.rs-i .lb{font-size:10px;color:var(--dim);margin-top:2px}
+.wr-words{margin-bottom:16px}.wr-words h4{font-size:13px;color:var(--err);margin-bottom:8px}
+.wr-chip{display:inline-block;padding:4px 12px;margin:2px 3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:12px}
+.r-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ===== ADMIN ===== */
+#screen-admin{min-height:100vh;padding:60px 20px 24px;max-width:900px;margin:0 auto}
+.a-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.a-head h2{font-family:'Space Grotesk';font-size:24px;font-weight:700}
+.a-tabs{display:flex;gap:8px;margin-bottom:20px}
+.a-tab{padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:0;color:var(--dim);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.a-tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.a-tab.on.o-tab{background:var(--red);border-color:var(--red)}
+.rtable{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:28px}
+.rtable th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--dim);letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.rtable th:first-child{border-radius:10px 0 0 0}.rtable th:last-child{border-radius:0 10px 0 0}
+.rtable td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.rtable tr:last-child td{border-bottom:none}
+.mph-h{color:var(--green);font-family:'Space Grotesk';font-weight:700;font-size:16px}
+.mph-m{color:var(--gold);font-family:'Space Grotesk';font-weight:700;font-size:16px}
+.mph-l{color:var(--err);font-family:'Space Grotesk';font-weight:700;font-size:16px}
+.rb{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block}
+.rb.rk{background:rgba(52,211,153,.12);color:var(--green)}.rb.rh{background:rgba(239,68,68,.12);color:var(--err)}.rb.rhr{background:rgba(251,146,60,.12);color:var(--orange)}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+.chart-box h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:160px;padding:0 10px}
+.bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bar{width:100%;max-width:36px;border-radius:5px 5px 0 0;min-height:4px}
+.bar.mb{background:linear-gradient(180deg,var(--blue),rgba(43,125,233,.5))}.bar.ob{background:linear-gradient(180deg,var(--red),rgba(232,68,58,.5))}
+.bar-lb{font-size:9px;color:var(--dim);white-space:nowrap}.bar-vl{font-size:10px;font-weight:600}
+.sum-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.sum-c{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.sum-c .sv{font-family:'Space Grotesk';font-size:26px;font-weight:700}.sum-c .sl{font-size:11px;color:var(--dim);margin-top:4px}
+.t-up{color:var(--green)}.t-dn{color:var(--err)}.t-fl{color:var(--gold)}
+
+@media(max-width:500px){
+  .char-grid{grid-template-columns:1fr;max-width:320px}
+  .wg{grid-template-columns:1fr 1fr}
+  .match-c{grid-template-columns:1fr}
+  .rs-row,.sum-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Home button (all screens) -->
+<button class="home-btn" id="home-btn" onclick="goHome()" title="Back to Home">🏠</button>
+
+<div class="feedback" id="feedback"></div>
+
+<!-- ===== SELECT ===== -->
+<div id="screen-select">
+  <div class="sel-title">Vocab <span>Quest</span></div>
+  <div class="sel-sub">Choose your player to start learning</div>
+  <div class="char-grid">
+    <div class="char-card m" onclick="selectChar('murphy')">
+      <div class="ch-av m"></div>
+      <div class="ch-name">Murphy</div>
+      <div class="ch-lvl">佐佐木朗希 Sasaki Roki</div>
+      <div class="ch-badge">BEGINNER</div>
+      <button class="btn-upload" onclick="event.stopPropagation();openUpload('murphy')">📷 上傳單字</button>
+    </div>
+    <div class="char-card o" onclick="selectChar('oliver')">
+      <div class="ch-av o"></div>
+      <div class="ch-name">Oliver</div>
+      <div class="ch-lvl">大谷翔平 Ohtani Shohei</div>
+      <div class="ch-badge">INTERMEDIATE</div>
+      <button class="btn-upload" onclick="event.stopPropagation();openUpload('oliver')">📷 上傳單字</button>
+    </div>
+  </div>
+  <div class="no-data-msg" id="murphy-msg" style="display:none">⚠️ Murphy 的單字資料尚未上傳</div>
+  <div class="no-data-msg" id="oliver-msg" style="display:none">⚠️ Oliver 的單字資料尚未上傳</div>
+  <button class="admin-link" onclick="showAdmin()">📊 Teacher Dashboard</button>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="screen-dash" class="hidden">
+  <div class="d-head" style="margin-top:36px;">
+    <div class="d-av" id="d-av"></div>
+    <div class="d-info">
+      <h2 id="d-name"></h2>
+      <p id="d-sub"></p>
+    </div>
+  </div>
+  <div class="week-sel">
+    <label>📅 選擇週次：</label>
+    <select id="week-picker" onchange="switchWeek(this.value)"></select>
+  </div>
+  <div id="dash-content">
+    <div class="wl-title">📋 Word List</div>
+    <div class="wg" id="wg"></div>
+    <button class="btn-go" onclick="startLearn()">📖 Start Learning</button>
+  </div>
+  <div class="week-empty hidden" id="week-empty">
+    <p>📭 這個學生還沒有上傳任何單字</p>
+    <p>請使用「📷 上傳單字」功能新增內容</p>
+  </div>
+</div>
+
+<!-- ===== LEARN ===== -->
+<div id="screen-learn" class="hidden">
+  <div class="page-wrap">
+    <div class="top-bar"><div class="prog-info" id="l-prog"></div></div>
+    <div class="prog-wrap"><div class="prog-fill blue" id="l-bar"></div></div>
+    <div id="l-area"></div>
+    <button class="btn-next" id="l-next" onclick="nextCard()">Next →</button>
+  </div>
+</div>
+
+<!-- ===== SENTENCES ===== -->
+<div id="screen-sent" class="hidden">
+  <div class="page-wrap">
+    <div class="top-bar"><div class="prog-info" id="s-prog"></div></div>
+    <div class="prog-wrap"><div class="prog-fill blue" id="s-bar"></div></div>
+    <div id="s-area"></div>
+    <button class="btn-next" id="s-next" onclick="nextSent()">Next →</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="screen-quiz" class="hidden">
+  <div class="q-top"><div class="q-phase" id="q-phase"></div><div class="q-pts">🏆 <span class="v" id="q-pts-v">0</span> pts</div></div>
+  <div class="prog-wrap"><div class="prog-fill purple" id="q-bar"></div></div>
+  <div id="q-content"></div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="screen-results" class="hidden">
+  <div class="baseball-field" id="bf">
+    <div class="infield"></div>
+    <div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div>
+    <div class="r-mound"></div>
+    <div class="r-pitcher" id="rp">
+      <div class="p-head" id="rp-head"></div>
+      <div class="p-body" id="rp-body"><div class="p-arm-r"></div><div class="p-arm-l"></div><span id="rp-num">17</span></div>
+      <div class="p-legs"><div></div><div></div></div>
+    </div>
+    <div class="r-ball" id="r-ball"></div>
+    <div class="r-batter" id="r-batter">
+      <div class="b-head"></div>
+      <div class="b-body"><div class="b-bat"></div></div>
+      <div class="b-legs"><div></div><div></div></div>
+    </div>
+    <div class="hit-ball" id="hit-ball"></div>
+    <div class="k-stamp" id="k-stamp">K</div>
+    <div class="r-overlay" id="r-overlay"><div class="r-big" id="r-big"></div><div class="r-sub" id="r-sub"></div></div>
+  </div>
+  <div class="speed-box" id="sp-box" style="opacity:0"><div class="sp-num" id="sp-num">0</div><div class="sp-unit">MPH（邁）</div><div class="sp-lbl" id="sp-lbl"></div></div>
+  <div class="r-stats" id="r-stats-wrap" style="opacity:0">
+    <div class="r-stats-card">
+      <div class="rs-row">
+        <div class="rs-i"><div class="ic">🅰️</div><div class="vl" id="r-mc">0</div><div class="lb">選擇題</div></div>
+        <div class="rs-i"><div class="ic">✏️</div><div class="vl" id="r-sp">0</div><div class="lb">填空題</div></div>
+        <div class="rs-i"><div class="ic">🔗</div><div class="vl" id="r-mt">0</div><div class="lb">配對題</div></div>
+      </div>
+      <div class="wr-words" id="wr-sec"></div>
+      <div class="r-btns">
+        <button class="btn-go" onclick="startQuiz()">🔄 Retry</button>
+        <button class="btn-go gold" onclick="goToDash()">📊 Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div id="screen-admin" class="hidden">
+  <div class="a-head"><h2>📊 Teacher Dashboard</h2><div id="conn-status" style="font-size:11px;padding:4px 12px;border-radius:12px;background:var(--surface2);color:var(--dim)">checking...</div></div>
+  <div class="a-tabs" id="a-tabs">
+    <button class="a-tab on" onclick="adminTab('all')">All</button>
+    <button class="a-tab" onclick="adminTab('murphy')">Murphy</button>
+    <button class="a-tab" onclick="adminTab('oliver')">Oliver</button>
+  </div>
+  <div style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn-upload" onclick="openUpload('murphy')" style="margin:0">📷 Murphy 上傳單字</button>
+    <button class="btn-upload" onclick="openUpload('oliver')" style="margin:0">📷 Oliver 上傳單字</button>
+  </div>
+  <div id="a-content"></div>
+</div>
+
+<!-- ===== UPLOAD MODAL ===== -->
+<div class="upload-modal hidden" id="upload-modal">
+  <div class="upload-box">
+    <h3 id="upload-title">📷 上傳單字照片</h3>
+    <div class="sub" id="upload-sub">拍照或選取單字表圖片，會自動上傳到 Google Drive</div>
+    <img class="upload-preview" id="upload-preview">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('upload-file').click()">
+      <div class="icon">📸</div>
+      <div class="hint">點擊<b>拍照</b>或<b>選擇圖片</b></div>
+    </div>
+    <input type="file" accept="image/*" capture="environment" id="upload-file" class="upload-input" onchange="handleFile(this)">
+    <div class="upload-status" id="upload-status"></div>
+    <div class="upload-btns">
+      <button class="btn-cancel" onclick="closeUpload()">取消</button>
+      <button class="btn-send" id="btn-send" onclick="sendUpload()" disabled>上傳至 Google Drive</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== WORD BANKS (per player, multi-week) =====
+const WORD_BANKS = {
+  murphy: {
+    "Week 6": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"finally",pos:"adverb",def:"after a long time or some difficulty",zh:"終於",sentences:["After months of looking, he <mark>finally</mark> found a job.","She <mark>finally</mark> passed her driving test on the third try."]},
+        {word:"money",pos:"noun",def:"the coins or banknotes (pieces of paper with values) that are used to buy things",zh:"錢",sentences:["It costs a lot of <mark>money</mark> to buy a house.","He saved enough <mark>money</mark> to take a trip abroad."]},
+        {word:"African",pos:"adjective",def:"relating or belonging to Africa; someone from Africa",zh:"非洲的",sentences:["One of my best friends is <mark>African</mark>.","<mark>African</mark> elephants are the largest land animals on Earth."]},
+        {word:"savanna",pos:"noun",def:"a large, flat area of land covered with grass, usually with few trees, that is found in hot countries, especially in Africa",zh:"莽原；草原",sentences:["Many wild animals live on the <mark>savanna</mark>.","The <mark>savanna</mark> stretches for hundreds of miles across the continent."]},
+        {word:"predators",pos:"plural noun",def:"an animal that hunts, kills, and eats other animals",zh:"掠食者",sentences:["Lions, tigers, and bears are considered <mark>predators</mark>.","Small fish try to hide from <mark>predators</mark> in the coral reef."]},
+        {word:"protection",pos:"noun",def:"the act of protecting or state of being protected",zh:"保護",sentences:["Always wear goggles as a <mark>protection</mark> for your eyes when using the machines.","The mother bird spread her wings in <mark>protection</mark> of her young."]},
+        {word:"morning",pos:"noun",def:"the part of the day from the time when the sun rises or you wake up until the middle of the day or lunch time",zh:"早上",sentences:["I got up late this <mark>morning</mark>.","She goes jogging every <mark>morning</mark> before breakfast."]},
+        {word:"format",pos:"noun",def:"the way something is designed, arranged, or produced",zh:"格式",sentences:["This year's event will have a new <mark>format</mark>.","Please save the file in PDF <mark>format</mark>."]},
+        {word:"explore",pos:"verb",def:"to go around a place where you have never been in order to find out what is there",zh:"探索",sentences:["The best way to <mark>explore</mark> the countryside is on foot.","Children love to <mark>explore</mark> the woods behind the school."]},
+        {word:"bargain",pos:"noun",def:"something on sale at a lower price than its true value",zh:"便宜貨；划算",sentences:["We got tickets to the show at half-price, a real <mark>bargain</mark>.","This jacket was a <mark>bargain</mark> at only ten dollars."]},
+        {word:"weird",pos:"adjective",def:"very strange and unusual, unexpected, or not natural",zh:"奇怪的",sentences:["That's <mark>weird</mark>, I thought I left my keys on the table but they're not there.","He has a <mark>weird</mark> habit of talking to himself in public."]},
+        {word:"allies",pos:"plural noun",def:"someone who helps and supports someone else",zh:"盟友",sentences:["We need to become <mark>allies</mark> to solve this problem.","The two countries have been <mark>allies</mark> for over fifty years."]},
+        {word:"kingdom",pos:"noun",def:"one of the groups that natural things can be divided into, depending on their type",zh:"王國；界",sentences:["What do you know about the animal <mark>kingdom</mark>?","The plant <mark>kingdom</mark> includes trees, flowers, and grasses."]},
+        {word:"cluster",pos:"verb",def:"to form or gather together",zh:"聚集",sentences:["All of his grandchildren <mark>clustered</mark> around him.","Stars <mark>cluster</mark> together to form galaxies."]},
+        {word:"anemone",pos:"noun",def:"a soft, brightly colored sea creature that looks like a flower and often lives on rocks in the ocean",zh:"海葵",sentences:["At low tide you can explore the tide pools for crabs, starfish, and <mark>anemones</mark>.","The clownfish lives inside the <mark>anemone</mark> for protection."]}
+      ]
+    },
+    "Week 1": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"certain",pos:"adjective",def:"having no doubt; sure",zh:"確定的",sentences:["I'm <mark>certain</mark> that I left my keys on the table.","Are you <mark>certain</mark> you want to go?"]},
+        {word:"half",pos:"noun",def:"one of two equal parts of something",zh:"一半",sentences:["Cut the apple in <mark>half</mark>.","<mark>Half</mark> of the students passed the test."]},
+        {word:"prefer",pos:"verb",def:"to like one thing more than another",zh:"偏好",sentences:["I <mark>prefer</mark> tea to coffee.","Do you <mark>prefer</mark> reading or watching TV?"]},
+        {word:"features",pos:"plural noun",def:"important or noticeable parts of something",zh:"特徵",sentences:["One of the best <mark>features</mark> of the car is its speed.","The map shows the main <mark>features</mark> of the city."]},
+        {word:"patterns",pos:"plural noun",def:"repeated designs or sequences",zh:"圖案；模式",sentences:["The butterfly has beautiful <mark>patterns</mark> on its wings.","Scientists look for <mark>patterns</mark> in the data."]},
+        {word:"nature",pos:"noun",def:"the physical world, including plants, animals, and landscapes",zh:"自然",sentences:["We love spending time in <mark>nature</mark>.","<mark>Nature</mark> is full of amazing creatures."]},
+        {word:"total",pos:"adjective",def:"complete; including everything",zh:"總共的",sentences:["The <mark>total</mark> cost of the trip was two hundred dollars.","There were a <mark>total</mark> of thirty students in the class."]},
+        {word:"digit",pos:"noun",def:"any of the numbers from 0 to 9",zh:"數字",sentences:["A phone number has ten <mark>digits</mark>.","The number 59 has two <mark>digits</mark>."]},
+        {word:"talent",pos:"noun",def:"a natural ability to do something well",zh:"天賦",sentences:["She has a <mark>talent</mark> for painting.","The show is looking for people with musical <mark>talent</mark>."]},
+        {word:"library",pos:"noun",def:"a building or room that has a collection of books for people to read or borrow",zh:"圖書館",sentences:["I borrowed three books from the <mark>library</mark>.","The school <mark>library</mark> has thousands of books."]},
+        {word:"insects",pos:"plural noun",def:"small creatures with six legs, such as ants or butterflies",zh:"昆蟲",sentences:["Many <mark>insects</mark> are attracted to light.","Bees and butterflies are common <mark>insects</mark> in the garden."]},
+        {word:"color",pos:"noun",def:"the appearance of things resulting from the way they reflect light",zh:"顏色",sentences:["What <mark>color</mark> is your new car?","The leaves change <mark>color</mark> in autumn."]},
+        {word:"discover",pos:"verb",def:"to find something for the first time or find out about something",zh:"發現",sentences:["Scientists <mark>discover</mark> new species every year.","She <mark>discovered</mark> a hidden door behind the bookshelf."]},
+        {word:"backyard",pos:"noun",def:"the area of land behind a house",zh:"後院",sentences:["The kids are playing in the <mark>backyard</mark>.","We planted a garden in our <mark>backyard</mark>."]},
+        {word:"twig",pos:"noun",def:"a very small, thin branch of a tree or bush",zh:"小樹枝",sentences:["The bird used <mark>twigs</mark> to build its nest.","She picked up a <mark>twig</mark> and drew a picture in the sand."]}
+      ]
+    },
+    "Week 2": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"investigate",pos:"verb",def:"to examine a crime, problem, or situation carefully to discover the truth",zh:"調查",sentences:["The police will <mark>investigate</mark> the robbery.","Scientists <mark>investigate</mark> how diseases spread."]},
+        {word:"repeat",pos:"verb",def:"to say or do something again",zh:"重複",sentences:["Could you <mark>repeat</mark> the question, please?","History tends to <mark>repeat</mark> itself."]},
+        {word:"human",pos:"adjective",def:"relating to or characteristic of people",zh:"人類的",sentences:["The <mark>human</mark> body needs water to survive.","It's only <mark>human</mark> to make mistakes."]},
+        {word:"minus",pos:"preposition",def:"reduced by; less",zh:"減去",sentences:["Ten <mark>minus</mark> three equals seven.","The temperature was <mark>minus</mark> five degrees."]},
+        {word:"defend",pos:"verb",def:"to protect someone or something from attack",zh:"防禦；保護",sentences:["The mother bear will <mark>defend</mark> her cubs.","Soldiers <mark>defend</mark> the country from enemies."]},
+        {word:"mishap",pos:"noun",def:"an unlucky accident or mistake",zh:"小事故；不幸",sentences:["We had a small <mark>mishap</mark> on the way to school.","The trip went smoothly without any <mark>mishaps</mark>."]},
+        {word:"interaction",pos:"noun",def:"communication or direct involvement with someone or something",zh:"互動",sentences:["<mark>Interaction</mark> with other students helps you learn faster.","The <mark>interaction</mark> between the two chemicals caused an explosion."]},
+        {word:"camouflage",pos:"noun",def:"the way that the color or shape of an animal or plant protects it by making it difficult to see",zh:"偽裝",sentences:["The chameleon uses <mark>camouflage</mark> to hide from predators.","Soldiers wear <mark>camouflage</mark> uniforms in the forest."]},
+        {word:"vegetables",pos:"plural noun",def:"plants or parts of plants that are eaten as food",zh:"蔬菜",sentences:["You should eat more <mark>vegetables</mark> to stay healthy.","We grow <mark>vegetables</mark> like tomatoes and peppers in our garden."]},
+        {word:"rule",pos:"noun",def:"an instruction that says how things must be done",zh:"規則",sentences:["The first <mark>rule</mark> is to always be on time.","You must follow the <mark>rules</mark> of the game."]},
+        {word:"objects",pos:"plural noun",def:"things that you can see or touch but that are not alive",zh:"物體",sentences:["There were several strange <mark>objects</mark> on the table.","Round <mark>objects</mark> roll easily on a flat surface."]},
+        {word:"ladybug",pos:"noun",def:"a small, round beetle that is usually red with black spots",zh:"瓢蟲",sentences:["A <mark>ladybug</mark> landed on my hand.","<mark>Ladybugs</mark> are helpful because they eat pests in the garden."]},
+        {word:"growing",pos:"adjective",def:"increasing in size, amount, or degree",zh:"成長中的",sentences:["There is a <mark>growing</mark> interest in learning languages.","The <mark>growing</mark> plant reached the top of the fence."]},
+        {word:"sequence",pos:"noun",def:"a set of related events or things that follow each other in a particular order",zh:"序列；順序",sentences:["The numbers 2, 4, 6, 8 form a <mark>sequence</mark>.","Put the pictures in the correct <mark>sequence</mark>."]},
+        {word:"series",pos:"noun",def:"a number of similar things or events that happen one after another",zh:"系列",sentences:["She watched the whole <mark>series</mark> in one weekend.","A <mark>series</mark> of earthquakes shook the region."]}
+      ]
+    },
+    "Week 3": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"bark",pos:"noun",def:"the hard outer covering of a tree",zh:"樹皮",sentences:["The <mark>bark</mark> of the old oak tree was rough and cracked.","Some animals chew on tree <mark>bark</mark> for food."]},
+        {word:"beautiful",pos:"adjective",def:"very attractive or pleasing",zh:"美麗的",sentences:["The sunset was <mark>beautiful</mark> tonight.","She wore a <mark>beautiful</mark> dress to the party."]},
+        {word:"finish",pos:"verb",def:"to complete something or come to the end of an activity",zh:"完成",sentences:["I need to <mark>finish</mark> my homework before dinner.","Did you <mark>finish</mark> reading the book?"]},
+        {word:"equal",pos:"adjective",def:"the same in size, amount, value, or importance",zh:"相等的",sentences:["Two plus two is <mark>equal</mark> to four.","Everyone should have <mark>equal</mark> rights."]},
+        {word:"salad",pos:"noun",def:"a mixture of raw vegetables, usually served with a dressing",zh:"沙拉",sentences:["I had a chicken <mark>salad</mark> for lunch.","She made a fresh <mark>salad</mark> with tomatoes and lettuce."]},
+        {word:"spiral",pos:"noun",def:"a shape made by a curve that goes around and around a central point",zh:"螺旋",sentences:["The snail's shell is a perfect <mark>spiral</mark>.","The staircase goes up in a <mark>spiral</mark>."]},
+        {word:"leopard",pos:"noun",def:"a large wild cat with yellowish fur and dark spots, found in Africa and Asia",zh:"花豹",sentences:["The <mark>leopard</mark> is one of the fastest animals in the world.","A <mark>leopard</mark> can climb trees with its prey."]},
+        {word:"prey",pos:"noun",def:"an animal that is hunted and killed by another animal for food",zh:"獵物",sentences:["The eagle swooped down on its <mark>prey</mark>.","Small fish are <mark>prey</mark> for larger fish and birds."]},
+        {word:"wings",pos:"plural noun",def:"the flat parts of a bird's or insect's body that it uses for flying",zh:"翅膀",sentences:["The butterfly spread its <mark>wings</mark> and flew away.","Birds use their <mark>wings</mark> to fly long distances."]},
+        {word:"counts",pos:"verb",def:"to say numbers in order; to be important",zh:"計算；重要",sentences:["She <mark>counts</mark> the stars every night.","Every vote <mark>counts</mark> in an election."]},
+        {word:"rainbow",pos:"noun",def:"an arch of colors visible in the sky after rain",zh:"彩虹",sentences:["We saw a beautiful <mark>rainbow</mark> after the storm.","A <mark>rainbow</mark> has seven colors."]},
+        {word:"indigo",pos:"noun",def:"a dark blue-purple color",zh:"靛藍色",sentences:["<mark>Indigo</mark> is one of the colors of the rainbow.","She painted the sky in shades of <mark>indigo</mark>."]},
+        {word:"violet",pos:"noun",def:"a blue-purple color; a small plant with purple or white flowers",zh:"紫羅蘭色；紫羅蘭",sentences:["<mark>Violet</mark> is the last color of the rainbow.","She picked a bunch of <mark>violets</mark> from the garden."]},
+        {word:"across",pos:"preposition",def:"from one side to the other side of something",zh:"橫越；穿過",sentences:["She walked <mark>across</mark> the street carefully.","The bridge goes <mark>across</mark> the river."]},
+        {word:"seasons",pos:"plural noun",def:"the four periods of the year: spring, summer, autumn, and winter",zh:"季節",sentences:["Each of the four <mark>seasons</mark> has its own weather.","My favorite of all the <mark>seasons</mark> is autumn."]}
+      ]
+    },
+    "Week 4": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"environment",pos:"noun",def:"the natural world in which people, animals, and plants live",zh:"環境",sentences:["We must protect the <mark>environment</mark> from pollution.","Plants grow well in a warm <mark>environment</mark>."]},
+        {word:"symmetry",pos:"noun",def:"the quality of having parts that match each other on both sides of a line",zh:"對稱",sentences:["The butterfly's wings have perfect <mark>symmetry</mark>.","<mark>Symmetry</mark> is common in nature and architecture."]},
+        {word:"famous",pos:"adjective",def:"known by many people",zh:"有名的",sentences:["Paris is <mark>famous</mark> for the Eiffel Tower.","She wants to be a <mark>famous</mark> singer one day."]},
+        {word:"order",pos:"noun",def:"the arrangement of things in relation to each other",zh:"順序；秩序",sentences:["Put the numbers in <mark>order</mark> from smallest to largest.","The teacher asked the students to keep the room in <mark>order</mark>."]},
+        {word:"spring",pos:"noun",def:"the season between winter and summer when plants begin to grow",zh:"春天",sentences:["Flowers bloom in <mark>spring</mark>.","<mark>Spring</mark> is my favorite time of year."]},
+        {word:"summer",pos:"noun",def:"the warmest season of the year, between spring and autumn",zh:"夏天",sentences:["We go swimming every <mark>summer</mark>.","<mark>Summer</mark> days are long and sunny."]},
+        {word:"fall",pos:"noun",def:"the season between summer and winter; autumn",zh:"秋天",sentences:["The leaves turn red and orange in the <mark>fall</mark>.","School starts again in the <mark>fall</mark>."]},
+        {word:"winter",pos:"noun",def:"the coldest season of the year, between autumn and spring",zh:"冬天",sentences:["It snows a lot here in <mark>winter</mark>.","We wear warm coats during <mark>winter</mark>."]},
+        {word:"springtime",pos:"noun",def:"the season of spring",zh:"春季",sentences:["In <mark>springtime</mark>, the garden comes alive with flowers.","Baby animals are often born in <mark>springtime</mark>."]},
+        {word:"creatures",pos:"plural noun",def:"living things, especially animals",zh:"生物",sentences:["The ocean is full of amazing <mark>creatures</mark>.","Tiny <mark>creatures</mark> live in the soil under our feet."]},
+        {word:"tucked",pos:"verb",def:"pushed or put something into a small space or a safe place",zh:"塞入；藏好",sentences:["She <mark>tucked</mark> the letter into her pocket.","The bird <mark>tucked</mark> its head under its wing."]},
+        {word:"cocoon",pos:"noun",def:"a covering of silk threads that a caterpillar makes around itself before it becomes a moth or butterfly",zh:"繭",sentences:["The caterpillar spun a <mark>cocoon</mark> and later became a butterfly.","Inside the <mark>cocoon</mark>, a magical change takes place."]},
+        {word:"symmetrical",pos:"adjective",def:"having two halves that are the same",zh:"對稱的",sentences:["A square is a <mark>symmetrical</mark> shape.","The building has a <mark>symmetrical</mark> design."]},
+        {word:"spotted",pos:"adjective",def:"having spots or marks of a different color",zh:"有斑點的",sentences:["The <mark>spotted</mark> deer hid among the trees.","She wore a <mark>spotted</mark> dress to the party."]},
+        {word:"snowflakes",pos:"plural noun",def:"small, soft, white pieces of frozen water that fall from the sky",zh:"雪花",sentences:["Each <mark>snowflake</mark> has a unique shape.","The children caught <mark>snowflakes</mark> on their tongues."]}
+      ]
+    },
+    "Week 7": {
+      unit:'H3-7.2', count:15,
+      words:[
+        {word:"enormous",pos:"adjective",def:"extremely large in size or amount",zh:"巨大的",sentences:["The whale is an <mark>enormous</mark> animal.","They live in an <mark>enormous</mark> house with twenty rooms."]},
+        {word:"termites",pos:"plural noun",def:"small insects that eat wood and can damage buildings",zh:"白蟻",sentences:["<mark>Termites</mark> destroyed the wooden fence.","A colony of <mark>termites</mark> can eat through a tree trunk."]},
+        {word:"immune",pos:"adjective",def:"protected against a particular disease or illness",zh:"免疫的",sentences:["Some people are <mark>immune</mark> to certain diseases.","The vaccine makes you <mark>immune</mark> to the flu."]},
+        {word:"cardboard",pos:"noun",def:"thick, stiff paper used for making boxes",zh:"紙板；硬紙板",sentences:["We packed the books in <mark>cardboard</mark> boxes.","The children made a castle out of <mark>cardboard</mark>."]},
+        {word:"soared",pos:"verb",def:"flew high in the air; rose quickly",zh:"翱翔；高飛",sentences:["The eagle <mark>soared</mark> above the mountains.","The kite <mark>soared</mark> high into the sky."]},
+        {word:"darkness",pos:"noun",def:"the state of being dark; absence of light",zh:"黑暗",sentences:["The room was in complete <mark>darkness</mark>.","Animals that live in <mark>darkness</mark> often have large eyes."]},
+        {word:"argument",pos:"noun",def:"a disagreement or debate between people",zh:"爭論",sentences:["They had an <mark>argument</mark> about where to go for dinner.","The children got into an <mark>argument</mark> over the toy."]},
+        {word:"darts",pos:"plural noun",def:"small pointed objects that are thrown at a round board in a game",zh:"飛鏢",sentences:["We played <mark>darts</mark> at the party.","She threw three <mark>darts</mark> and hit the bullseye."]},
+        {word:"poisonous",pos:"adjective",def:"containing poison; very harmful or deadly if eaten or touched",zh:"有毒的",sentences:["Some mushrooms are <mark>poisonous</mark> and should not be eaten.","The <mark>poisonous</mark> snake hid under the rocks."]},
+        {word:"tentacles",pos:"plural noun",def:"long, thin, flexible parts of some animals, used for feeling, holding, or moving",zh:"觸手；觸鬚",sentences:["The octopus has eight <mark>tentacles</mark>.","Jellyfish use their <mark>tentacles</mark> to catch food."]},
+        {word:"egret",pos:"noun",def:"a type of heron with long white feathers",zh:"白鷺",sentences:["The <mark>egret</mark> stood still in the shallow water.","We saw a beautiful white <mark>egret</mark> by the lake."]},
+        {word:"rhino",pos:"noun",def:"a large, heavy animal with thick skin and one or two horns on its nose (short for rhinoceros)",zh:"犀牛",sentences:["The <mark>rhino</mark> is an endangered species.","A <mark>rhino</mark> can weigh over two thousand kilograms."]},
+        {word:"perch",pos:"verb",def:"to sit or rest on something high or narrow",zh:"棲息；停留",sentences:["The bird <mark>perched</mark> on the branch.","The cat <mark>perched</mark> on top of the bookshelf."]},
+        {word:"goby",pos:"noun",def:"a small fish often found in shallow water or coral reefs",zh:"鰕虎魚",sentences:["The <mark>goby</mark> is a tiny fish that lives near the ocean floor.","A <mark>goby</mark> and a shrimp often share the same burrow."]},
+        {word:"antennae",pos:"plural noun",def:"the two long, thin parts on the heads of insects used for feeling things",zh:"觸角",sentences:["The ant uses its <mark>antennae</mark> to find food.","Butterflies have long, thin <mark>antennae</mark> on their heads."]}
+      ]
+    }
+  },
+  oliver: {
+    "Week 1": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"prey",pos:"noun",def:"an animal hunted by others for food",zh:"獵物",sentences:["The lion stalked its <mark>prey</mark> through the tall grass.","The hawk spotted its <mark>prey</mark> from high above."]},
+        {word:"brittle",pos:"adjective",def:"very easily broken",zh:"脆的；易碎的",sentences:["The dry branches were <mark>brittle</mark> and snapped easily.","Old bones can become <mark>brittle</mark> with age."]},
+        {word:"system",pos:"noun",def:"a set of connected things that work together",zh:"系統",sentences:["The solar <mark>system</mark> includes the sun and all the planets.","The school has a new computer <mark>system</mark>."]},
+        {word:"bristle",pos:"noun",def:"a short, stiff hair or fiber",zh:"鬃毛；剛毛",sentences:["The brush has stiff <mark>bristles</mark> for cleaning.","The hedgehog has sharp <mark>bristles</mark> on its back."]},
+        {word:"contour",pos:"noun",def:"the shape or outline of something",zh:"輪廓；等高線",sentences:["The mountain's <mark>contour</mark> was smooth and curved.","The map shows the <mark>contour</mark> of the land."]},
+        {word:"services",pos:"plural noun",def:"helpful actions provided to others",zh:"服務",sentences:["The fire department offers emergency <mark>services</mark>.","The hotel provides excellent <mark>services</mark> to its guests."]},
+        {word:"lenses",pos:"plural noun",def:"transparent pieces of glass or plastic used to focus light",zh:"鏡片；透鏡",sentences:["My camera has two <mark>lenses</mark> for different shots.","She wore glasses with thick <mark>lenses</mark>."]},
+        {word:"counties",pos:"plural noun",def:"divisions of a state or country for administration",zh:"縣；郡",sentences:["There are several <mark>counties</mark> in the state of Texas.","Each <mark>county</mark> has its own courthouse."]},
+        {word:"gases",pos:"plural noun",def:"substances like air with no fixed shape or volume",zh:"氣體",sentences:["Some <mark>gases</mark> can be harmful if inhaled.","The scientist collected <mark>gases</mark> from the volcano."]},
+        {word:"activities",pos:"plural noun",def:"things that people do for enjoyment or purpose",zh:"活動",sentences:["We planned outdoor <mark>activities</mark> for the kids.","After-school <mark>activities</mark> help students learn new skills."]},
+        {word:"feather",pos:"noun",def:"a light, soft structure that covers birds",zh:"羽毛",sentences:["The bird lost a <mark>feather</mark> while flying.","She used a <mark>feather</mark> to tickle her little brother."]},
+        {word:"thousand",pos:"noun",def:"the number 1,000",zh:"一千",sentences:["Over a <mark>thousand</mark> people attended the event.","There are a <mark>thousand</mark> meters in one kilometer."]},
+        {word:"fluffing",pos:"verb",def:"making something soft and full by shaking or patting it",zh:"使蓬鬆",sentences:["She was <mark>fluffing</mark> the pillows on the couch.","The bird was <mark>fluffing</mark> its feathers to stay warm."]},
+        {word:"cushion",pos:"noun",def:"a soft bag filled with material used for comfort",zh:"墊子；靠墊",sentences:["He rested his head on the <mark>cushion</mark>.","Place a <mark>cushion</mark> under your knees for support."]},
+        {word:"umbrella",pos:"noun",def:"a device used for protection from rain or sun",zh:"雨傘",sentences:["She opened her <mark>umbrella</mark> as the rain began.","Always bring an <mark>umbrella</mark> on cloudy days."]}
+      ]
+    },
+    "Week 2": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"survive",pos:"verb",def:"to stay alive despite danger or hardship",zh:"生存；存活",sentences:["Only a few plants can <mark>survive</mark> in the desert.","The sailors had to <mark>survive</mark> on rainwater for days."]},
+        {word:"defense",pos:"noun",def:"protection against attack or harm",zh:"防禦；防護",sentences:["The animal's sharp claws are its main <mark>defense</mark>.","The team played strong <mark>defense</mark> in the second half."]},
+        {word:"classified",pos:"adjective",def:"officially kept secret or organized into groups",zh:"保密的；機密的",sentences:["The documents were marked <mark>classified</mark> by the government.","The <mark>classified</mark> files could not be shared with the public."]},
+        {word:"acquire",pos:"verb",def:"to get or gain something",zh:"取得；獲得",sentences:["She hopes to <mark>acquire</mark> new skills in her course.","It takes time to <mark>acquire</mark> a second language."]},
+        {word:"sufficient",pos:"adjective",def:"enough for a particular purpose",zh:"足夠的",sentences:["They had <mark>sufficient</mark> food for the journey.","Is the lighting <mark>sufficient</mark> for reading?"]},
+        {word:"primaries",pos:"plural noun",def:"the main feathers on a bird's wings used for flight",zh:"初級飛羽",sentences:["The eagle's <mark>primaries</mark> help it soar through the sky.","The bird spread its <mark>primaries</mark> to catch the wind."]},
+        {word:"sandwiches",pos:"plural noun",def:"food made with two slices of bread and filling between",zh:"三明治",sentences:["We brought <mark>sandwiches</mark> for the picnic.","She made three <mark>sandwiches</mark> for lunch."]},
+        {word:"taxes",pos:"plural noun",def:"money people pay to the government",zh:"稅；稅款",sentences:["Everyone pays <mark>taxes</mark> to help fund public services.","The government used <mark>taxes</mark> to build new roads."]},
+        {word:"viruses",pos:"plural noun",def:"tiny germs that cause diseases",zh:"病毒",sentences:["Vaccines help protect us from dangerous <mark>viruses</mark>.","Some <mark>viruses</mark> spread through the air we breathe."]},
+        {word:"colonies",pos:"plural noun",def:"groups of people or animals living together",zh:"殖民地；群落",sentences:["Ants live in large <mark>colonies</mark> underground.","The penguin <mark>colonies</mark> numbered in the thousands."]},
+        {word:"tricolored",pos:"adjective",def:"having three colors",zh:"三色的",sentences:["The flag was <mark>tricolored</mark>: red, white, and blue.","The <mark>tricolored</mark> bird was easy to identify."]},
+        {word:"reflection",pos:"noun",def:"an image seen in a mirror or water",zh:"倒影；反射",sentences:["He saw his <mark>reflection</mark> in the glass.","The mountains were beautiful in the lake's <mark>reflection</mark>."]},
+        {word:"appearance",pos:"noun",def:"the way someone or something looks",zh:"外表；外觀",sentences:["Her neat <mark>appearance</mark> made a good impression.","The magician changed his <mark>appearance</mark> with a costume."]},
+        {word:"soaring",pos:"verb",def:"flying or rising high in the air",zh:"翱翔；高飛",sentences:["The hawk was <mark>soaring</mark> above the mountains.","The airplane was <mark>soaring</mark> through the clouds."]},
+        {word:"delicate",pos:"adjective",def:"easily damaged or fragile",zh:"精緻的；脆弱的",sentences:["The flower's petals were thin and <mark>delicate</mark>.","Handle the <mark>delicate</mark> glass with care."]}
+      ]
+    },
+    "Week 3": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"achieve",pos:"verb",def:"to successfully complete something or reach a goal",zh:"達成；實現",sentences:["She worked hard to <mark>achieve</mark> her dream of becoming a doctor.","It takes practice to <mark>achieve</mark> your goals."]},
+        {word:"entice",pos:"verb",def:"to attract or persuade someone by offering something pleasant",zh:"引誘；吸引",sentences:["The smell of popcorn can <mark>entice</mark> people into the movie theater.","The colorful display <mark>enticed</mark> customers to buy the product."]},
+        {word:"supporting",pos:"adjective",def:"giving help or encouragement",zh:"支持的；輔助的",sentences:["He played a <mark>supporting</mark> role in the school play.","She gave me <mark>supporting</mark> advice when I needed help."]},
+        {word:"complex",pos:"adjective",def:"having many parts that are connected or difficult to understand",zh:"複雜的",sentences:["The math problem was too <mark>complex</mark> for beginners.","The city has a <mark>complex</mark> road system."]},
+        {word:"destination",pos:"noun",def:"the place where someone is going",zh:"目的地",sentences:["After a long flight, we reached our <mark>destination</mark>.","Paris is a popular <mark>destination</mark> for travelers."]},
+        {word:"consumers",pos:"plural noun",def:"people who buy and use goods or services",zh:"消費者",sentences:["Companies study what <mark>consumers</mark> want to improve sales.","<mark>Consumers</mark> have the right to know what is in their food."]},
+        {word:"monkeys",pos:"plural noun",def:"small to medium-sized primates that usually have long tails",zh:"猴子",sentences:["<mark>Monkeys</mark> are known for their playful behavior.","The <mark>monkeys</mark> swung from branch to branch."]},
+        {word:"hoaxes",pos:"plural noun",def:"tricks or lies meant to fool people",zh:"騙局；惡作劇",sentences:["The story about aliens landing turned out to be one of the biggest <mark>hoaxes</mark>.","People should check the facts before sharing stories that might be <mark>hoaxes</mark>."]},
+        {word:"speeches",pos:"plural noun",def:"formal talks given to an audience",zh:"演講；演說",sentences:["The student gave one of the best <mark>speeches</mark> at graduation.","The politician gave three <mark>speeches</mark> in one day."]},
+        {word:"galaxies",pos:"plural noun",def:"large systems of stars, gas, and dust held together by gravity",zh:"星系",sentences:["The Milky Way and Andromeda are both <mark>galaxies</mark>.","Scientists have discovered thousands of <mark>galaxies</mark> in space."]},
+        {word:"quench",pos:"verb",def:"to satisfy thirst or desire",zh:"解渴；平息",sentences:["He drank cold water to <mark>quench</mark> his thirst.","Nothing could <mark>quench</mark> her desire to learn."]},
+        {word:"scouring",pos:"verb",def:"cleaning or searching something thoroughly",zh:"徹底搜索；用力擦洗",sentences:["She was <mark>scouring</mark> the beach for seashells.","The police were <mark>scouring</mark> the area for clues."]},
+        {word:"distract",pos:"verb",def:"to take attention away from something",zh:"使分心；分散注意力",sentences:["The loud noise outside <mark>distracted</mark> me from my homework.","Don't <mark>distract</mark> the driver while he is driving."]},
+        {word:"blend",pos:"verb",def:"to mix things together smoothly",zh:"混合",sentences:["She used a blender to <mark>blend</mark> the fruits into a smoothie.","The artist <mark>blended</mark> the colors to create a new shade."]},
+        {word:"rapidly",pos:"adverb",def:"very quickly",zh:"迅速地",sentences:["The storm developed <mark>rapidly</mark> over the ocean.","The child's vocabulary grew <mark>rapidly</mark> with daily reading."]}
+      ]
+    },
+    "Week 4": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"monitor",pos:"verb",def:"to watch or check something carefully",zh:"監控；監視",sentences:["Doctors <mark>monitor</mark> patients to track their recovery.","Teachers <mark>monitor</mark> students during the exam."]},
+        {word:"compound",pos:"noun",def:"a substance made from two or more elements",zh:"化合物；複合物",sentences:["Salt is a <mark>compound</mark> made from sodium and chlorine.","Water is a <mark>compound</mark> made of hydrogen and oxygen."]},
+        {word:"adaptation",pos:"noun",def:"a change that helps something fit its environment",zh:"適應；改編",sentences:["The polar bear's thick fur is an <mark>adaptation</mark> to the cold.","Camouflage is an <mark>adaptation</mark> that helps animals hide."]},
+        {word:"brainstorm",pos:"verb",def:"to think of many ideas quickly",zh:"腦力激盪",sentences:["We <mark>brainstormed</mark> ideas for our science project.","Let's <mark>brainstorm</mark> solutions to this problem."]},
+        {word:"filtering",pos:"verb",def:"removing unwanted parts from a substance",zh:"過濾",sentences:["He was <mark>filtering</mark> the water to make it safe to drink.","The mask is <mark>filtering</mark> dust from the air."]},
+        {word:"holidays",pos:"plural noun",def:"special days for celebration or rest",zh:"假日；節日",sentences:["We visit our grandparents during the <mark>holidays</mark>.","School is closed on national <mark>holidays</mark>."]},
+        {word:"berries",pos:"plural noun",def:"small, round, and juicy fruits",zh:"漿果",sentences:["Strawberries and blueberries are common <mark>berries</mark>.","The birds ate all the <mark>berries</mark> from the bush."]},
+        {word:"classes",pos:"plural noun",def:"groups of students or categories",zh:"班級；種類",sentences:["She takes four different <mark>classes</mark> this semester.","Scientists divide animals into different <mark>classes</mark>."]},
+        {word:"skies",pos:"plural noun",def:"the upper atmosphere as seen from Earth",zh:"天空",sentences:["The <mark>skies</mark> were clear and full of stars.","Dark <mark>skies</mark> are perfect for stargazing."]},
+        {word:"victories",pos:"plural noun",def:"acts of winning or defeating others",zh:"勝利",sentences:["The team celebrated three big <mark>victories</mark> this season.","Their <mark>victories</mark> inspired the whole school."]},
+        {word:"fancy",pos:"adjective",def:"expensive or decorative",zh:"高檔的；精美的",sentences:["She wore a <mark>fancy</mark> dress to the party.","The <mark>fancy</mark> restaurant had beautiful decorations."]},
+        {word:"graceful",pos:"adjective",def:"moving in a smooth and attractive way",zh:"優雅的",sentences:["The dancer's movements were slow and <mark>graceful</mark>.","The swan moved in a <mark>graceful</mark> way across the lake."]},
+        {word:"waterproof",pos:"adjective",def:"not allowing water to pass through",zh:"防水的",sentences:["My watch is <mark>waterproof</mark>, so I can swim with it.","She bought a <mark>waterproof</mark> jacket for hiking in the rain."]},
+        {word:"classify",pos:"verb",def:"to arrange into groups based on similarities",zh:"分類；歸類",sentences:["Scientists <mark>classify</mark> animals by their physical traits.","We <mark>classify</mark> plants by the shape of their leaves."]},
+        {word:"balance",pos:"noun",def:"a state where things are equal or stable",zh:"平衡",sentences:["Yoga helps improve your strength and <mark>balance</mark>.","A good <mark>balance</mark> of work and play is important."]}
+      ]
+    },
+    "Week 6": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"mimicry",pos:"noun",def:"the ability to look or act like something else",zh:"模仿；擬態",sentences:["<mark>Mimicry</mark> helps some insects avoid predators.","The actor's <mark>mimicry</mark> of the president made everyone laugh."]},
+        {word:"species",pos:"noun",def:"categories of living things",zh:"物種；種類",sentences:["There are over 300 <mark>species</mark> of hummingbirds.","Scientists have discovered many new <mark>species</mark> in the ocean."]},
+        {word:"environment",pos:"noun",def:"all the living things and conditions of a place",zh:"環境",sentences:["We must protect the <mark>environment</mark> from pollution.","Animals adapt to their <mark>environment</mark> over time."]},
+        {word:"arranged",pos:"verb",def:"put things in a particular order or position",zh:"排列；安排",sentences:["She <mark>arranged</mark> the books neatly on the shelf.","The flowers were <mark>arranged</mark> in a beautiful vase."]},
+        {word:"habitat",pos:"noun",def:"the natural home of an animal, plant, or organism",zh:"棲息地",sentences:["Frogs live in a wetland <mark>habitat</mark>.","Polar bears need a cold <mark>habitat</mark> to survive."]},
+        {word:"coward",pos:"noun",def:"a person who lacks courage",zh:"懦夫；膽小鬼",sentences:["He was called a <mark>coward</mark> for running away from the challenge.","It takes courage not to be a <mark>coward</mark> when things get difficult."]},
+        {word:"boycott",pos:"verb",def:"to refuse to buy or use something as a protest",zh:"抵制；杯葛",sentences:["They decided to <mark>boycott</mark> the company for unfair labor practices.","The students chose to <mark>boycott</mark> the event to show their disagreement."]},
+        {word:"toil",pos:"verb",def:"to work very hard for a long time",zh:"辛苦勞作",sentences:["She <mark>toiled</mark> in the field under the hot sun.","Workers <mark>toil</mark> for hours to build the new bridge."]},
+        {word:"choice",pos:"noun",def:"a decision between two or more options",zh:"選擇",sentences:["He made the right <mark>choice</mark> to study harder.","You have a <mark>choice</mark> between two different paths."]},
+        {word:"allow",pos:"verb",def:"to let someone do something",zh:"允許；讓",sentences:["We don't <mark>allow</mark> phones in the classroom.","Her parents <mark>allow</mark> her to stay up late on weekends."]},
+        {word:"caterpillar",pos:"noun",def:"a small, worm-like insect that becomes a butterfly or moth",zh:"毛毛蟲",sentences:["The <mark>caterpillar</mark> crawled along the branch.","A <mark>caterpillar</mark> spins a cocoon before becoming a butterfly."]},
+        {word:"naturalist",pos:"noun",def:"a person who studies animals and plants in nature",zh:"自然學家",sentences:["The <mark>naturalist</mark> recorded the bird's behavior.","The <mark>naturalist</mark> spent years studying insects in the rainforest."]},
+        {word:"weaker",pos:"adjective",def:"less strong or powerful",zh:"較弱的",sentences:["The <mark>weaker</mark> tree fell during the storm.","After the illness, he felt <mark>weaker</mark> than usual."]},
+        {word:"enemies",pos:"plural noun",def:"people or animals that are hostile to one another",zh:"敵人；天敵",sentences:["The rabbit hid from its natural <mark>enemies</mark>.","The two countries had been <mark>enemies</mark> for decades."]},
+        {word:"nectar",pos:"noun",def:"a sweet liquid in flowers that attracts insects",zh:"花蜜",sentences:["Bees collect <mark>nectar</mark> to make honey.","Butterflies feed on the <mark>nectar</mark> of flowers."]}
+      ]
+    },
+    "Week 7": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"adapted",pos:"p.t. verb",def:"changed to fit requirements",zh:"適應；改造",sentences:["Camels are <mark>adapted</mark> to live in deserts.","The bird's beak is <mark>adapted</mark> for catching fish."]},
+        {word:"dangerous",pos:"adjective",def:"might cause harm",zh:"危險的",sentences:["Handling wild animals can be <mark>dangerous</mark>.","It is <mark>dangerous</mark> to swim alone in the ocean."]},
+        {word:"indigenous",pos:"adjective",def:"having started in and coming naturally from a certain place",zh:"本土的；原住民的",sentences:["The <mark>indigenous</mark> people have lived there for centuries.","The rainforest is home to many <mark>indigenous</mark> plants."]},
+        {word:"poisons",pos:"plural noun",def:"things that cause pain or death",zh:"毒物；毒素",sentences:["Some frogs carry <mark>poisons</mark> on their skin.","The scientist studied the effects of various <mark>poisons</mark>."]},
+        {word:"predators",pos:"plural noun",def:"animals that kill other animals for food",zh:"掠食者；天敵",sentences:["Lions are <mark>predators</mark> that hunt in groups.","Wolves are top <mark>predators</mark> in the forest."]},
+        {word:"scales",pos:"plural noun",def:"the thin, dry pieces of skin that form the outer covering of snakes, lizards, and other reptiles",zh:"鱗片",sentences:["Snakes are covered in overlapping <mark>scales</mark>.","The fish have shiny <mark>scales</mark> that reflect the light."]},
+        {word:"toxin",pos:"noun",def:"a type of poison",zh:"毒素",sentences:["The snake's bite delivers a powerful <mark>toxin</mark>.","Scientists are looking for treatments against the <mark>toxin</mark>."]},
+        {word:"relevant",pos:"adjective",def:"closely connected to the topic",zh:"相關的；切題的",sentences:["Her question was <mark>relevant</mark> to the discussion.","Please only share <mark>relevant</mark> information in your report."]},
+        {word:"voyage",pos:"noun",def:"a long journey, especially by sea or space",zh:"航行；旅程",sentences:["The explorers went on a <mark>voyage</mark> across the Atlantic.","The <mark>voyage</mark> to the moon lasted several days."]},
+        {word:"decoy",pos:"noun",def:"a thing used to trick or distract",zh:"誘餌；陷阱",sentences:["The hunter used a duck <mark>decoy</mark> to lure birds.","The spy used a <mark>decoy</mark> to distract the guards."]},
+        {word:"design",pos:"noun",def:"a plan or pattern used to make something",zh:"設計；圖樣",sentences:["She created a <mark>design</mark> for the new logo.","The <mark>design</mark> of the building was beautiful and modern."]},
+        {word:"brightly",pos:"adverb",def:"in a vivid or strong way",zh:"明亮地；鮮豔地",sentences:["The sun shone <mark>brightly</mark> through the window.","The stars shone <mark>brightly</mark> in the night sky."]},
+        {word:"warning",pos:"noun",def:"a message that tells of danger or problems ahead",zh:"警告；警示",sentences:["The red light was a <mark>warning</mark> to stop.","The weather <mark>warning</mark> told people to stay indoors."]},
+        {word:"markings",pos:"plural noun",def:"patterns or lines on the surface of something",zh:"斑紋；標記",sentences:["The butterfly's wings have colorful <mark>markings</mark>.","The zebra's <mark>markings</mark> help it blend into a herd."]},
+        {word:"generally",pos:"adverb",def:"in most cases; usually",zh:"通常；一般來說",sentences:["<mark>Generally</mark>, people arrive early to the event.","It <mark>generally</mark> takes two hours to drive to the city."]}
+      ]
+    },
+    "Week 8": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"structure",pos:"noun",def:"the arrangement of parts in something complex",zh:"結構；構造",sentences:["The bridge's <mark>structure</mark> is strong and stable.","The <mark>structure</mark> of the building includes steel and concrete."]},
+        {word:"copycat",pos:"noun",def:"a person who imitates someone else",zh:"模仿者",sentences:["He was called a <mark>copycat</mark> for drawing the same picture.","She didn't want to be a <mark>copycat</mark>, so she came up with her own idea."]},
+        {word:"caption",pos:"noun",def:"a sentence or two that tells what a photograph shows",zh:"說明文字；圖說",sentences:["The <mark>caption</mark> under the photo explained who was in it.","She wrote a funny <mark>caption</mark> for the picture."]},
+        {word:"facts",pos:"noun",def:"information proven as true",zh:"事實",sentences:["The book is full of science <mark>facts</mark>.","Always base your argument on <mark>facts</mark>, not opinions."]},
+        {word:"boundary",pos:"noun",def:"a line that marks the edge of an area",zh:"邊界；界限",sentences:["The fence marks the <mark>boundary</mark> between the two yards.","The river forms the <mark>boundary</mark> between the two countries."]},
+        {word:"foundation",pos:"noun",def:"the base or groundwork of something",zh:"基礎；地基",sentences:["A strong <mark>foundation</mark> keeps a building from falling.","Reading is the <mark>foundation</mark> of all learning."]},
+        {word:"exploit",pos:"verb",def:"to use something for your own benefit, often unfairly",zh:"利用；剝削",sentences:["Some companies <mark>exploit</mark> workers by paying low wages.","We should not <mark>exploit</mark> natural resources without care."]},
+        {word:"scrounge",pos:"verb",def:"to get something by searching or asking",zh:"到處搜找；討要",sentences:["He tried to <mark>scrounge</mark> a snack from his friends.","She was <mark>scrounging</mark> for change in her bag."]},
+        {word:"ouch",pos:"exclamation",def:"used to express sudden pain",zh:"哎喲",sentences:["<mark>Ouch</mark>! I stubbed my toe on the table.","She said '<mark>ouch</mark>' when the nurse gave her the shot."]},
+        {word:"browser",pos:"noun",def:"a program used to access the internet",zh:"瀏覽器",sentences:["She opened the <mark>browser</mark> to search for images.","Update your <mark>browser</mark> for the best experience."]},
+        {word:"mockingbird",pos:"noun",def:"a bird known for copying the songs of other birds",zh:"嘲鶇",sentences:["The <mark>mockingbird</mark> sang many different bird calls.","A <mark>mockingbird</mark> can copy the sounds of other birds perfectly."]},
+        {word:"honeybee",pos:"noun",def:"a flying insect that makes honey and pollinates plants",zh:"蜜蜂",sentences:["The <mark>honeybee</mark> collected pollen from the flowers.","A <mark>honeybee</mark> visits hundreds of flowers each day."]},
+        {word:"rhyme",pos:"noun",def:"words that have the same ending sounds",zh:"押韻；韻",sentences:["'Cat' and 'bat' are a <mark>rhyme</mark>.","She wrote a poem with a <mark>rhyme</mark> at the end of each line."]},
+        {word:"wiggle",pos:"verb",def:"to move with small quick movements",zh:"扭動；搖動",sentences:["The puppy began to <mark>wiggle</mark> with excitement.","She tried to <mark>wiggle</mark> her loose tooth."]},
+        {word:"tongue",pos:"noun",def:"a muscle in the mouth used for tasting and speaking",zh:"舌頭",sentences:["She stuck out her <mark>tongue</mark> in a funny face.","The frog caught the fly with its sticky <mark>tongue</mark>."]}
+      ]
+    },
+    "Week 9": {
+      unit:'H2-9.2', count:15,
+      words:[
+        {word:"independent",pos:"adjective",def:"not needing help or control from others",zh:"獨立的",sentences:["He is very <mark>independent</mark> and likes to work alone.","She became more <mark>independent</mark> after moving to college."]},
+        {word:"dependent",pos:"adjective",def:"relying on someone or something else",zh:"依賴的",sentences:["The baby is <mark>dependent</mark> on its parents for care.","Young birds are <mark>dependent</mark> on their parents for food."]},
+        {word:"definition",pos:"noun",def:"the meaning of a word",zh:"定義；解釋",sentences:["We looked up the <mark>definition</mark> of 'brave.'","The <mark>definition</mark> of 'habitat' is the natural home of an animal."]},
+        {word:"example",pos:"noun",def:"specific people, places, or things that support a fact or claim",zh:"例子；範例",sentences:["He gave an <mark>example</mark> to help explain the idea.","Can you give me an <mark>example</mark> of a compound word?"]},
+        {word:"sour",pos:"adjective",def:"having an acidic or sharp taste",zh:"酸的",sentences:["The lemon was too <mark>sour</mark> to eat plain.","The <mark>sour</mark> candy made her face scrunch up."]},
+        {word:"boil",pos:"verb",def:"to heat a liquid until it bubbles",zh:"沸騰；煮沸",sentences:["Please <mark>boil</mark> the water before adding the pasta.","She <mark>boiled</mark> the eggs for breakfast."]},
+        {word:"announce",pos:"verb",def:"to tell people something in a formal way",zh:"宣布；宣告",sentences:["They will <mark>announce</mark> the winner after the contest.","The principal <mark>announced</mark> a school holiday."]},
+        {word:"moist",pos:"adjective",def:"a little bit wet or damp",zh:"潮濕的；濕潤的",sentences:["The cake was soft and <mark>moist</mark> inside.","The soil needs to stay <mark>moist</mark> for the plants to grow."]},
+        {word:"scout",pos:"noun",def:"a person who looks for information or talent",zh:"偵察員；星探",sentences:["The <mark>scout</mark> watched the game for new players.","A <mark>scout</mark> was sent ahead to check the path."]},
+        {word:"outline",pos:"noun",def:"a general plan or summary",zh:"大綱；輪廓",sentences:["She wrote an <mark>outline</mark> before starting her essay.","The teacher asked us to prepare an <mark>outline</mark> for the report."]},
+        {word:"confuse",pos:"verb",def:"to make someone uncertain or mixed up",zh:"使困惑；混淆",sentences:["The instructions may <mark>confuse</mark> young students.","Don't <mark>confuse</mark> 'their' with 'there.'"]},
+        {word:"attention",pos:"noun",def:"focusing your mind on something",zh:"注意力；關注",sentences:["The teacher asked for everyone's <mark>attention</mark>.","The magician caught everyone's <mark>attention</mark> with his trick."]},
+        {word:"opposite",pos:"adjective",def:"completely different or reverse",zh:"相反的；對立的",sentences:["Hot and cold are <mark>opposite</mark> temperatures.","They walked in <mark>opposite</mark> directions."]},
+        {word:"expected",pos:"adjective",def:"thought likely to happen",zh:"預料中的；預期的",sentences:["The test was <mark>expected</mark> to be hard, but it was easy.","The <mark>expected</mark> arrival time is three o'clock."]},
+        {word:"survival",pos:"noun",def:"the act of staying alive",zh:"生存；存活",sentences:["The animals depend on instincts for <mark>survival</mark>.","<mark>Survival</mark> skills are important for camping trips."]}
+      ]
+    }
+  }
+};
+
+// ===== STATE =====
+let player=null, currentWeek=null, words=[], li=0, si=0, qScore={mc:0,sp:0,mt:0}, qWrong=[], qStep=0, qQs=[];
+
+// ===== HELPER: get available weeks for a player =====
+function getWeeks(who){
+  const bank = WORD_BANKS[who];
+  if(!bank || typeof bank !== 'object') return [];
+  return Object.keys(bank).sort((a,b)=>{
+    const na=parseInt(a.match(/\d+/)||[0]), nb=parseInt(b.match(/\d+/)||[0]);
+    return na-nb;
+  });
+}
+
+function getCurrentBank(){
+  if(!player || !currentWeek) return null;
+  return WORD_BANKS[player][currentWeek] || null;
+}
+
+// ===== GOOGLE SHEETS CONFIG =====
+// ★★★ 把這裡換成你的 Apps Script Web App URL ★★★
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu8SNnWG0ox2kF_c18dbMPT5doaL2-lEUuRjtmfDAxJOLYgolqb-FTaD-8cUf1OSj9/exec';
+
+// ===== RECORDS (Google Sheets + localStorage fallback) =====
+let cachedRecs = null;
+
+function getRecs(){ try{return JSON.parse(localStorage.getItem('vq_recs')||'[]')}catch(e){return[]} }
+
+async function saveRec(p,mph,mc,sp,mt,wrong,unit,week){
+  const rec = {player:p,mph,mc,sp,mt,wrong,unit,week,date:new Date().toISOString()};
+  // Always save locally first (fallback)
+  const r=getRecs(); r.push(rec); localStorage.setItem('vq_recs',JSON.stringify(r));
+  cachedRecs = null; // clear cache
+  // Then send to Google Sheets
+  if(APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'){
+    try{
+      await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(rec)});
+      console.log('✅ Record saved to Google Sheets');
+    }catch(e){console.warn('⚠️ Google Sheets save failed, using local:',e)}
+  }
+}
+
+async function fetchCloudRecs(){
+  if(APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'){
+    try{
+      const res = await fetch(APPS_SCRIPT_URL);
+      const data = await res.json();
+      if(data.status==='ok' && data.records){
+        cachedRecs = data.records;
+        return data.records;
+      }
+    }catch(e){console.warn('⚠️ Cloud fetch failed, using local:',e)}
+  }
+  return getRecs();
+}
+
+// ===== SCREENS =====
+function showScreen(id){document.querySelectorAll('[id^="screen-"]').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0);
+  document.getElementById('home-btn').style.display = id==='screen-select'?'none':'flex';
+}
+function goHome(){showScreen('screen-select')}
+
+function selectChar(who){
+  const weeks = getWeeks(who);
+  if(weeks.length === 0){
+    document.getElementById(who+'-msg').style.display='block';
+    setTimeout(()=>document.getElementById(who+'-msg').style.display='none',3000);
+    return;
+  }
+  player=who;
+  currentWeek=weeks[weeks.length-1]; // default to latest week
+  words=WORD_BANKS[who][currentWeek].words;
+  showScreen('screen-dash');
+  renderDash();
+}
+
+function switchWeek(week){
+  if(!player || !WORD_BANKS[player][week]) return;
+  currentWeek=week;
+  words=WORD_BANKS[player][currentWeek].words;
+  renderDash();
+}
+
+function goToDash(){showScreen('screen-dash');renderDash()}
+
+// ===== DASHBOARD =====
+function renderDash(){
+  const b=getCurrentBank();
+  const weeks=getWeeks(player);
+  document.getElementById('d-av').className='d-av '+(player==='murphy'?'m':'o');
+  document.getElementById('d-name').textContent=player==='murphy'?"Murphy's Quest":"Oliver's Quest";
+
+  // Build week picker
+  const picker=document.getElementById('week-picker');
+  picker.innerHTML='';
+  weeks.forEach(w=>{
+    const opt=document.createElement('option');
+    opt.value=w; opt.textContent=w+' ('+WORD_BANKS[player][w].unit+')';
+    if(w===currentWeek) opt.selected=true;
+    picker.appendChild(opt);
+  });
+
+  if(!b || weeks.length===0){
+    document.getElementById('d-sub').textContent='尚未上傳單字';
+    document.getElementById('dash-content').classList.add('hidden');
+    document.getElementById('week-empty').classList.remove('hidden');
+    document.querySelector('.week-sel').classList.add('hidden');
+    return;
+  }
+
+  document.querySelector('.week-sel').classList.remove('hidden');
+  document.getElementById('dash-content').classList.remove('hidden');
+  document.getElementById('week-empty').classList.add('hidden');
+  document.getElementById('d-sub').textContent=b.unit+' · '+currentWeek+' · '+b.count+' words';
+  const g=document.getElementById('wg');g.innerHTML='';
+  words.forEach(w=>{const d=document.createElement('div');d.className='wc';d.innerHTML=`<span class="dot"></span>${w.word}`;g.appendChild(d)});
+}
+
+// ===== TTS — OPTIMIZED =====
+let bestVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  const want=['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Daniel','Fiona','Microsoft Zira','Microsoft Mark'];
+  for(const n of want){const v=vs.find(x=>x.name.includes(n));if(v){bestVoice=v;return}}
+  bestVoice=vs.find(v=>v.lang==='en-US')||vs.find(v=>v.lang==='en-GB')||vs.find(v=>v.lang.startsWith('en'))||null;
+}
+speechSynthesis.onvoiceschanged=pickVoice;pickVoice();
+
+function speak(text,rate=0.95){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  if(bestVoice)u.voice=bestVoice;
+  u.lang='en-US';u.rate=rate;u.pitch=1.1;u.volume=1;
+  speechSynthesis.speak(u);
+}
+function playWord(w){speak(w,0.92)}
+function playSent(raw){speak(raw.replace(/<\/?mark>/g,''),0.95)}
+
+// ===== LEARN =====
+function startLearn(){li=0;showScreen('screen-learn');renderCard()}
+function renderCard(){
+  const w=words[li];
+  document.getElementById('l-prog').textContent=(li+1)+' / '+words.length;
+  document.getElementById('l-bar').style.width=((li+1)/words.length*100)+'%';
+  const btn=document.getElementById('l-next');
+  if(li===words.length-1){btn.textContent='📝 Example Sentences →';btn.className='btn-next gold'}
+  else{btn.textContent='Next →';btn.className='btn-next'}
+  document.getElementById('l-area').innerHTML=`
+    <div class="scard">
+      <div class="sc-top"><span class="sc-pos">${w.pos}</span><button class="btn-snd" onclick="playWord('${w.word}')">🔊</button></div>
+      <div class="sc-word">${w.word}</div>
+      <div class="sc-div"></div>
+      <div class="sc-lbl en">📖 ENGLISH DEFINITION</div>
+      <div class="sc-def">${w.def}</div>
+      <div class="sc-lbl zh">💡 中文提示</div>
+      <div class="sc-zh">${w.zh}</div>
+    </div>`;
+  setTimeout(()=>playWord(w.word),350);
+}
+function nextCard(){if(li<words.length-1){li++;renderCard()}else goSent()}
+
+// ===== SENTENCES =====
+function goSent(){si=0;showScreen('screen-sent');renderSent()}
+function renderSent(){
+  const w=words[si];
+  document.getElementById('s-prog').textContent=(si+1)+' / '+words.length;
+  document.getElementById('s-bar').style.width=((si+1)/words.length*100)+'%';
+  const btn=document.getElementById('s-next');
+  if(si===words.length-1){btn.textContent='🎯 Start Quiz!';btn.className='btn-next gold'}
+  else{btn.textContent='Next →';btn.className='btn-next'}
+  const sh=w.sentences.map((s,i)=>`
+    <div class="st-sent">${s}</div>
+    <button class="btn-listen" onclick="playSent(words[${si}].sentences[${i}])">🔊 Listen & repeat</button>
+  `).join('');
+  document.getElementById('s-area').innerHTML=`
+    <div class="st-card">
+      <div class="st-wr"><div class="st-w">${w.word}</div><span class="st-pos">${w.pos}</span><button class="btn-snd-s" onclick="playWord('${w.word}')">🔊</button></div>
+      <div style="font-size:14px;color:var(--dim);margin-bottom:4px">📖 ${w.def}</div>
+      <div style="font-size:13px;color:var(--gold);margin-bottom:16px">💡 ${w.zh}</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:12px">EXAMPLE SENTENCES — Read aloud!</div>
+      ${sh}
+    </div>`;
+}
+function nextSent(){if(si<words.length-1){si++;renderSent()}else startQuiz()}
+
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('screen-learn').classList.contains('hidden')&&e.key==='ArrowRight')nextCard();
+  if(!document.getElementById('screen-sent').classList.contains('hidden')&&e.key==='ArrowRight')nextSent();
+});
+
+// ===== QUIZ =====
+function startQuiz(){qScore={mc:0,sp:0,mt:0};qWrong=[];qStep=0;buildQ();showScreen('screen-quiz');renderQ()}
+
+function buildQ(){
+  qQs=[];const sh=[...words].sort(()=>Math.random()-.5);
+  sh.slice(0,5).forEach(w=>{
+    const ot=words.filter(x=>x.word!==w.word).sort(()=>Math.random()-.5).slice(0,3);
+    qQs.push({type:'mc',word:w,opts:[w,...ot].sort(()=>Math.random()-.5)});
+  });
+  sh.slice(5,10).forEach(w=>qQs.push({type:'fill',word:w}));
+  qQs.push({type:'match',ws:sh.slice(10,15)});
+}
+
+function fillHint(w){
+  const a=w.split(''),show=new Set([0,1]);
+  if(a.length>=6)show.add(Math.floor(a.length/2));
+  if(a.length>=8)show.add(2);
+  return a.map((c,i)=>show.has(i)?c:'_').join('');
+}
+
+function renderQ(){
+  const tot=qQs.length,pts=qScore.mc+qScore.sp+qScore.mt;
+  document.getElementById('q-pts-v').textContent=pts;
+  document.getElementById('q-bar').style.width=(qStep/tot*100)+'%';
+  if(qStep>=tot){showResults();return}
+  const q=qQs[qStep],c=document.getElementById('q-content'),L=['A','B','C','D'];
+  if(q.type==='mc'){
+    document.getElementById('q-phase').textContent='🅰️ MULTIPLE CHOICE';
+    c.innerHTML=`<div class="qcard"><div class="ql">Q${qStep+1}/${tot}</div><div class="qt">Which word means:</div><div class="qs">"${q.word.def}"</div>
+      <div class="mc-opts">${q.opts.map((o,i)=>`<button class="mc-o" onclick="ansMC(this,'${o.word}','${q.word.word}')"><span class="lt">${L[i]}</span><span>${o.word}</span></button>`).join('')}</div></div>`;
+  } else if(q.type==='fill'){
+    document.getElementById('q-phase').textContent='✏️ FILL IN THE BLANK';
+    const raw=q.word.sentences[0].replace(/<\/?mark>/g,'');
+    const blank=raw.replace(new RegExp(q.word.word,'gi'),'______');
+    c.innerHTML=`<div class="qcard"><div class="ql">Q${qStep+1}/${tot}</div><div class="qt">Fill in the blank:</div>
+      <div class="fill-s">${blank}</div>
+      <div class="fill-h">💡 Hint: <span>${fillHint(q.word.word)}</span> (${q.word.word.length} letters)</div>
+      <div style="font-size:13px;color:var(--dim);margin-bottom:14px">📖 ${q.word.def}</div>
+      <div class="fill-row"><button class="btn-hear" onclick="playWord('${q.word.word}')">🔊</button>
+      <input class="fill-in" id="fi" type="text" placeholder="Type the word..." autocomplete="off">
+      <button class="btn-chk" onclick="ansFill()">Check</button></div></div>`;
+    setTimeout(()=>{playWord(q.word.word);const i=document.getElementById('fi');if(i){i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')ansFill()})}},300);
+  } else {
+    document.getElementById('q-phase').textContent='🔗 MATCHING';
+    const ds=[...q.ws].sort(()=>Math.random()-.5);
+    c.innerHTML=`<div class="qcard"><div class="ql">Match words with definitions</div>
+      <div class="match-c"><div><div class="match-cl">Words</div><div class="match-is" id="mw">${q.ws.map(w=>`<div class="mi" data-w="${w.word}" onclick="selMW(this)">${w.word}</div>`).join('')}</div></div>
+      <div><div class="match-cl">Definitions</div><div class="match-is" id="md">${ds.map(w=>`<div class="mi" data-w="${w.word}" onclick="selMD(this)">${w.def.length>55?w.def.slice(0,52)+'...':w.def}</div>`).join('')}</div></div></div></div>`;
+    window._ms={sel:null,done:0,tot:q.ws.length};
+  }
+}
+
+function ansMC(btn,ch,cor){
+  btn.parentElement.querySelectorAll('.mc-o').forEach(o=>{o.classList.add('ans');o.style.pointerEvents='none';
+    const w=o.querySelector('span:last-child').textContent;if(w===cor)o.classList.add('ok');if(w===ch&&ch!==cor)o.classList.add('no')});
+  if(ch===cor){qScore.mc+=20;fb('correct','✅ Correct! +20')}else{fb('wrong','❌ Answer: "'+cor+'"');if(!qWrong.includes(cor))qWrong.push(cor)}
+  setTimeout(()=>{qStep++;renderQ()},1500);
+}
+function ansFill(){
+  const inp=document.getElementById('fi');if(!inp)return;const q=qQs[qStep],a=inp.value.trim().toLowerCase(),cor=q.word.word.toLowerCase();
+  if(a===cor){inp.classList.add('ok');qScore.sp+=20;fb('correct','✅ Correct! +20')}
+  else{inp.classList.add('no');fb('wrong','❌ Answer: "'+q.word.word+'"');if(!qWrong.includes(q.word.word))qWrong.push(q.word.word)}
+  inp.disabled=true;document.querySelector('.btn-chk').disabled=true;
+  setTimeout(()=>{qStep++;renderQ()},1800);
+}
+function selMW(el){if(el.classList.contains('done'))return;document.querySelectorAll('#mw .mi').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');window._ms.sel=el.dataset.w}
+function selMD(el){
+  if(el.classList.contains('done')||!window._ms.sel)return;const s=window._ms,we=document.querySelector('#mw .mi.sel');
+  if(el.dataset.w===s.sel){el.classList.add('done');we.classList.add('done');we.classList.remove('sel');s.done++;qScore.mt+=10;fb('correct','✅ Match! +10');s.sel=null;
+    if(s.done>=s.tot)setTimeout(()=>{qStep++;renderQ()},1000)}
+  else{el.classList.add('err');fb('wrong','❌ Try again!');if(!qWrong.includes(s.sel))qWrong.push(s.sel);setTimeout(()=>el.classList.remove('err'),500)}
+}
+
+// ===== RESULTS — BASEBALL ANIMATION =====
+function showResults(){
+  showScreen('screen-results');
+  const raw=qScore.mc+qScore.sp+qScore.mt, max=5*20+5*20+5*10, mph=Math.round(raw/max*100);
+  const b=getCurrentBank();
+  saveRec(player,mph,qScore.mc,qScore.sp,qScore.mt,[...qWrong],b.unit,currentWeek);
+
+  // Setup pitcher appearance
+  const ph=document.getElementById('rp-head'),pb=document.getElementById('rp-body');
+  ph.className='p-head '+(player==='murphy'?'m':'o');
+  pb.className='p-body '+(player==='murphy'?'m':'o');
+  document.getElementById('rp-num').textContent=player==='murphy'?'17':'17';
+
+  let rType,big,sub;
+  if(mph>=95){rType='k';big='STRIKEOUT!';sub='完全三振！球速驚人！🔥'}
+  else if(mph>=90){rType='k';big='STRIKEOUT!';sub='三振出局！好球！⚡'}
+  else if(mph>=85){rType='h';big='BASE HIT';sub='被打出安打...下次加油 💪'}
+  else{rType='hr';big='HOME RUN!';sub='被打出全壘打！需要更多練習 😤'}
+
+  // Reset
+  const rp=document.getElementById('rp'),rb=document.getElementById('r-ball'),bat=document.getElementById('r-batter'),
+    hb=document.getElementById('hit-ball'),ks=document.getElementById('k-stamp'),ov=document.getElementById('r-overlay'),
+    bgt=document.getElementById('r-big'),sbt=document.getElementById('r-sub');
+  rp.classList.remove('throw');rb.classList.remove('go');rb.style.opacity='0';
+  bat.classList.remove('swing','miss');hb.classList.remove('single','homer');hb.style.opacity='0';
+  ks.classList.remove('show');ov.classList.remove('show');
+  document.getElementById('sp-box').style.opacity='0';document.getElementById('r-stats-wrap').style.opacity='0';
+  bgt.className='r-big '+rType;bgt.textContent=big;sbt.textContent=sub;
+
+  // Animation timeline
+  setTimeout(()=>rp.classList.add('throw'),600);
+  setTimeout(()=>rb.classList.add('go'),900);
+  setTimeout(()=>{
+    if(rType==='k'){bat.classList.add('miss');setTimeout(()=>ks.classList.add('show'),400)}
+    else{bat.classList.add('swing');setTimeout(()=>{hb.classList.add(rType==='h'?'single':'homer')},250)}
+  },1600);
+  setTimeout(()=>ov.classList.add('show'),2400);
+  setTimeout(()=>{
+    const sb=document.getElementById('sp-box');sb.style.opacity='1';sb.style.transition='opacity .5s';
+    animNum('sp-num',0,mph,1200);
+    const l=document.getElementById('sp-lbl');
+    if(mph>=95)l.textContent='🔥 Dominant Pitch!';else if(mph>=90)l.textContent='⚡ Nasty Fastball!';
+    else if(mph>=85)l.textContent='💪 Decent Speed';else l.textContent='📚 Needs More Practice';
+  },3200);
+  setTimeout(()=>{
+    const rs=document.getElementById('r-stats-wrap');rs.style.opacity='1';rs.style.transition='opacity .5s';
+    document.getElementById('r-mc').textContent=qScore.mc;document.getElementById('r-sp').textContent=qScore.sp;document.getElementById('r-mt').textContent=qScore.mt;
+    const ws=document.getElementById('wr-sec');
+    if(qWrong.length)ws.innerHTML=`<h4>📝 需要複習：</h4>${qWrong.map(w=>`<span class="wr-chip">${w}</span>`).join('')}`;
+    else ws.innerHTML='<h4 style="color:var(--green)">🎉 Perfect Game!</h4>';
+  },4200);
+}
+
+function animNum(id,from,to,dur){
+  const el=document.getElementById(id),st=performance.now();
+  !function step(now){const p=Math.min((now-st)/dur,1);el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)}(st);
+}
+
+// ===== ADMIN =====
+function showAdmin(){showScreen('screen-admin');checkConnection();adminTab('all')}
+function adminTab(tab){
+  document.querySelectorAll('.a-tab').forEach(t=>{t.classList.remove('on','o-tab')});
+  const ts=document.querySelectorAll('.a-tab');
+  if(tab==='all')ts[0].classList.add('on');else if(tab==='murphy')ts[1].classList.add('on');else{ts[2].classList.add('on');ts[2].classList.add('o-tab')}
+  renderAdmin(tab);
+}
+async function renderAdmin(f){
+  document.getElementById('a-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--dim)">⏳ Loading records...</div>';
+  let recs = await fetchCloudRecs();
+  if(f!=='all')recs=recs.filter(r=>r.player===f);
+  const c=document.getElementById('a-content');
+  if(!recs.length){c.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--dim)"><div style="font-size:48px;margin-bottom:16px">📭</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">No records yet</div><div style="font-size:14px">測驗記錄會在完成測驗後自動出現。</div></div>';return}
+  const mphs=recs.map(r=>r.mph),avg=Math.round(mphs.reduce((a,b)=>a+b,0)/mphs.length),best=Math.max(...mphs),
+    trend=mphs.length>=2?mphs[mphs.length-1]-mphs[0]:0;
+  let tc='t-fl',ti='→';if(trend>0){tc='t-up';ti='↑ +'+trend}else if(trend<0){tc='t-dn';ti='↓ '+trend}
+  let h=`<div class="sum-cards"><div class="sum-c"><div class="sv">${avg}</div><div class="sl">平均球速</div></div><div class="sum-c"><div class="sv" style="color:var(--green)">${best}</div><div class="sl">最佳球速</div></div><div class="sum-c"><div class="sv ${tc}">${ti}</div><div class="sl">進步幅度</div></div></div>`;
+  h+=`<div class="chart-box"><h3>📈 球速趨勢</h3><div class="bars">`;
+  recs.slice(-12).forEach(r=>{const d=new Date(r.date),ds=(d.getMonth()+1)+'/'+d.getDate(),bc=r.player==='murphy'?'mb':'ob';
+    h+=`<div class="bar-w"><div class="bar-vl">${r.mph}</div><div class="bar ${bc}" style="height:${Math.max(r.mph*1.4,8)}px"></div><div class="bar-lb">${ds}</div></div>`});
+  h+=`</div></div>`;
+  h+=`<div class="chart-box"><h3>📋 測驗記錄</h3><div style="overflow-x:auto"><table class="rtable"><tr><th>日期</th><th>學員</th><th>單元</th><th>球速</th><th>結果</th><th>選擇</th><th>填空</th><th>配對</th><th>錯誤單字</th></tr>`;
+  [...recs].reverse().forEach(r=>{
+    const d=new Date(r.date),ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+    let mc='mph-l',badge='rhr',bt='HOME RUN';if(r.mph>=90){mc='mph-h';badge='rk';bt='STRIKEOUT'}else if(r.mph>=85){mc='mph-m';badge='rh';bt='BASE HIT'}
+    h+=`<tr><td>${ds}</td><td style="font-weight:600;color:${r.player==='murphy'?'var(--blue)':'var(--red)'}">${r.player==='murphy'?'Murphy':'Oliver'}</td><td>${r.unit||''}</td><td class="${mc}">${r.mph}</td><td><span class="rb ${badge}">${bt}</span></td><td>${r.mc}</td><td>${r.sp}</td><td>${r.mt}</td><td style="font-size:11px;color:var(--dim);max-width:140px">${r.wrong&&r.wrong.length?r.wrong.join(', '):'—'}</td></tr>`;
+  });
+  h+=`</table></div></div>`;
+  c.innerHTML=h;
+}
+
+function fb(type,msg){const el=document.getElementById('feedback');el.className='feedback '+type;el.textContent=msg;setTimeout(()=>el.classList.add('show'),10);setTimeout(()=>el.classList.remove('show'),1400)}
+
+// Connection status
+async function checkConnection(){
+  const el=document.getElementById('conn-status');
+  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){el.textContent='⚠️ Local mode (未設定 Google Sheets)';el.style.color='var(--gold)';return}
+  try{const r=await fetch(APPS_SCRIPT_URL);const d=await r.json();if(d.status==='ok'){el.textContent='🟢 Connected to Google Sheets';el.style.color='var(--green)'}else throw new Error()}
+  catch(e){el.textContent='🔴 Cloud unavailable (using local)';el.style.color='var(--err)'}
+}
+
+// ===== PHOTO UPLOAD =====
+let uploadTarget = null;
+let uploadBase64 = null;
+let uploadFileName = null;
+
+function openUpload(who){
+  uploadTarget = who;
+  uploadBase64 = null;
+  uploadFileName = null;
+  document.getElementById('upload-title').textContent = '📷 ' + (who==='murphy'?'Murphy':'Oliver') + ' 上傳單字照片';
+  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-zone').style.display='block';
+  document.getElementById('upload-status').textContent='';
+  document.getElementById('upload-status').className='upload-status';
+  document.getElementById('btn-send').disabled=true;
+  document.getElementById('upload-file').value='';
+  document.getElementById('upload-modal').classList.remove('hidden');
+}
+
+function closeUpload(){
+  document.getElementById('upload-modal').classList.add('hidden');
+  uploadBase64=null; uploadFileName=null; uploadTarget=null;
+}
+
+function handleFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  uploadFileName = file.name;
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = function(e){
+    uploadBase64 = e.target.result; // data:image/...;base64,...
+    const prev = document.getElementById('upload-preview');
+    prev.src = uploadBase64;
+    prev.style.display = 'block';
+    document.getElementById('upload-zone').style.display='none';
+    document.getElementById('upload-status').textContent='✅ 照片已選取，點「上傳」送出';
+    document.getElementById('upload-status').className='upload-status ok';
+    document.getElementById('btn-send').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function sendUpload(){
+  if(!uploadBase64 || !uploadTarget) return;
+
+  const statusEl = document.getElementById('upload-status');
+  const btnSend = document.getElementById('btn-send');
+  btnSend.disabled = true;
+  statusEl.textContent = '⏳ 上傳中...';
+  statusEl.className = 'upload-status wait';
+
+  // Check if Apps Script URL is set
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE'){
+    statusEl.textContent = '⚠️ 尚未設定 Google Sheets URL，請先完成部署設定';
+    statusEl.className = 'upload-status err';
+    btnSend.disabled = false;
+    return;
+  }
+
+  try {
+    const payload = {
+      action: 'upload_image',
+      player: uploadTarget,
+      fileName: uploadFileName || 'vocab_photo.jpg',
+      imageData: uploadBase64,
+      date: new Date().toISOString()
+    };
+
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(payload)
+    });
+
+    // no-cors mode = opaque response, but data is sent
+    statusEl.textContent = '🟢 已上傳！老師會在 Google Drive 中看到照片';
+    statusEl.className = 'upload-status ok';
+    fb('correct','📷 照片上傳成功！');
+
+    // Also save a local record
+    const localUploads = JSON.parse(localStorage.getItem('vq_uploads')||'[]');
+    localUploads.push({player:uploadTarget, fileName:uploadFileName, date:new Date().toISOString()});
+    localStorage.setItem('vq_uploads', JSON.stringify(localUploads));
+
+    setTimeout(()=>closeUpload(), 2000);
+  } catch(e) {
+    console.warn('Upload failed:', e);
+    statusEl.textContent = '🔴 上傳失敗，請確認網路連線後重試';
+    statusEl.className = 'upload-status err';
+    btnSend.disabled = false;
+  }
+}
+
+// Close modal on backdrop click
+document.getElementById('upload-modal').addEventListener('click', function(e){
+  if(e.target === this) closeUpload();
+});
+
+// Hide home btn on select screen initially
+document.getElementById('home-btn').style.display='none';
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
