@@ -108,6 +108,10 @@ button{font-family:inherit}
 .btn-go{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--blue);color:#fff}
 .btn-go:hover{background:var(--blue-l);transform:translateY(-1px)}
 .btn-go.gold{background:var(--gold);color:#1a1a2e}
+.btn-go.green{background:var(--green);color:#042f2e}
+.btn-go.green:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.mode-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px}
+@media(max-width:500px){.mode-btns{grid-template-columns:1fr}}
 
 /* ===== LEARN / SENTENCES shared ===== */
 .page-wrap{min-height:100vh;display:flex;flex-direction:column;padding:60px 20px 20px;max-width:620px;margin:0 auto}
@@ -402,7 +406,11 @@ button{font-family:inherit}
   <div id="dash-content">
     <div class="wl-title">📋 Word List</div>
     <div class="wg" id="wg"></div>
-    <button class="btn-go" onclick="startLearn()">📖 Start Learning</button>
+    <div class="mode-btns">
+      <button class="btn-go" onclick="startLearn()">📖 單字</button>
+      <button class="btn-go green" onclick="goSent()">💬 句子</button>
+      <button class="btn-go gold" onclick="startQuiz()">🎯 考試</button>
+    </div>
   </div>
   <div class="week-empty hidden" id="week-empty">
     <p>📭 這個學生還沒有上傳任何單字</p>
